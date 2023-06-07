@@ -1,2 +1,0 @@
-do AresiaSRAM_run_msim_rtl_vhdl.do
-run -all
