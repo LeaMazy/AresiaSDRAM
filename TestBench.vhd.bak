@@ -8,26 +8,32 @@ use ieee.numeric_std.all;
 use work.simulPkg.all;
 
 -- ENTITY
-entity TestBenchTop is
+entity TestBench is
 end entity;
 
-architecture VHDL of TestBenchTop is
+architecture VHDL of TestBench is
 	component Top is
     port (
 		-- INPUTS
-		enableDebug, switchSEL, switchSEL2   : IN    STD_LOGIC; -- input for debuger
-		TOPclock                             : IN    STD_LOGIC; --must go through pll
+		enableDebug									 : IN    STD_LOGIC; -- debugger mode
+		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN    STD_LOGIC; -- inputs for debuger
+		switchBoot									 : IN 	STD_LOGIC; -- input for bootloader
+		TOPclock                             : IN    STD_LOGIC; -- must go through pll
 		buttonClock                          : IN    STD_LOGIC;
-		reset                                : IN    STD_LOGIC;                                    --SW0
+		reset                                : IN    STD_LOGIC;
+		rx												 : IN 	STD_LOGIC;
+		--SW0
 
 		-- OUTPUTS
 		TOPdisplay1                          : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x80000004
 		TOPdisplay2                          : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x80000008
-		TOPleds                              : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0)                 --0x8000000c
+		TOPleds                              : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);			  		 --0x8000000c
+		tx												 : OUT 	STD_LOGIC
 	);
 	end component;
 
 	signal reset, ck : std_logic;
+	signal sigBoot : std_logic;
 	signal counter, progcounter, instr : std_logic_vector(31 downto 0);
     
 	signal dataAddr: std_logic_vector(31 downto 0);
@@ -41,6 +47,8 @@ architecture VHDL of TestBenchTop is
 	type mem is array(0 to 2047) of std_logic_vector(15 downto 0);
 	signal TabMemory : mem :=(others => (others => '0'));
 	
+	signal sigtx : std_logic;
+	signal sigrx : std_logic;
 															 
 
 	BEGIN
@@ -52,11 +60,19 @@ architecture VHDL of TestBenchTop is
 		reset        	 => reset,
 		TOPdisplay1     => SigTOPdisplay1,
 		TOPdisplay2     => SigTOPdisplay2,
+		rx					 => sigrx,
 		
 		enableDebug 	 => '0',
-		switchSEL		 => '0',
-		switchSEL2      => '0',
-		buttonClock		 => '0'
+		SW8		 		 => '0',
+		SW7		 		 => '0',
+		SW6		 		 => '0',
+		SW5		 		 => '0',
+		SW4		 		 => '0',
+		SW3		 		 => '0',
+		switchBoot 		 => sigBoot,
+		buttonClock		 => '0',
+		tx					 => sigtx
+		
 		
 	);
     
@@ -106,7 +122,7 @@ architecture VHDL of TestBenchTop is
     reg1F       <= PKG_reg1F;
 	 
 
-	clocktestbench: process
+		clocktestbench: process
 		begin
 		-- init  simulation
 			ck <= '1';
@@ -119,8 +135,56 @@ architecture VHDL of TestBenchTop is
 		begin
 		-- init  simulation
 			reset <= '1';
-			wait for 2 ns;
+			wait for 1000 ns;
 			reset <= '0';
+--			wait for 10100 ns;
+--			reset <= '1';
+--			wait for 410 ns;
+--			reset <= '0';
 			wait;
 		end process;
+		
+		bootTestbench: process
+		begin
+		--init  simulation
+--   		sigBoot <= '1';
+--   		wait for 2100 ns;
+			sigBoot <= '1';
+			wait for 10100 ns;
+   		sigBoot <= '0';
+--			wait for 12100 ns;
+--			sigBoot <= '1';
+--			wait for 10100 ns;
+--   		sigBoot <= '0';
+--			wait for 12100 ns;
+--			sigBoot <= '1';
+--			wait for 10100 ns;
+--   		sigBoot <= '0';
+			wait;
+		end process;
+		
+		uarttestbench: process
+		begin
+		-- init  simulation
+			wait for 1000 ns;
+			sigrx <= '1';
+			wait for 100 ns;
+			sigrx <= '0';
+--			wait for 100 ns;
+--			sigrx <= '0';
+--			wait for 100 ns;
+--			sigrx <= '0';
+--			wait for 100 ns;
+--			sigrx <= '0';
+--			wait for 100 ns;
+--			sigrx <= '0';
+--			wait for 100 ns;
+--			sigrx <= '1';
+--			wait for 100 ns;
+--			sigrx <= '0';
+--			wait for 100 ns;
+--			sigrx <= '0';
+			wait;
+		end process;
+		
 END vhdl;

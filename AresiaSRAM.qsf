@@ -186,6 +186,16 @@ set_location_assignment PIN_D12 -to switchBoot
 set_location_assignment PIN_V10 -to rx
 set_location_assignment PIN_W10 -to tx
 set_global_assignment -name EDA_TEST_BENCH_FILE TestBench.vhd -section_id TestBench
+set_location_assignment PIN_B14 -to SW8
+set_location_assignment PIN_A14 -to SW7
+set_location_assignment PIN_A13 -to SW6
+set_location_assignment PIN_B12 -to SW5
+set_location_assignment PIN_A12 -to SW4
+set_location_assignment PIN_C12 -to SW3
+set_global_assignment -name VHDL_FILE SDRAM_package.vhd
+set_global_assignment -name VHDL_FILE SDRAM_controller.vhd
+set_global_assignment -name VHDL_FILE SDRAM_32b.vhd
+set_global_assignment -name VHDL_FILE miniCache.vhd
 set_global_assignment -name VHDL_FILE Top.vhd
 set_global_assignment -name VHDL_FILE TestBench.vhd
 set_global_assignment -name VHDL_FILE simul_var_pkg.vhd
