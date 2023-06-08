@@ -9,26 +9,23 @@ use work.simulPkg.all;
 use work.SDRAM_package.ALL;
 
 -- ENTITY
-entity TestBench is
+entity TestBenchTop is
 end entity;
 
-architecture VHDL of TestBench is
+architecture VHDL of TestBenchTop is
 	component Top is
     port (
 		-- INPUTS
-		enableDebug									 : IN    STD_LOGIC; -- debugger mode
-		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN    STD_LOGIC; -- inputs for debuger
-		switchBoot									 : IN 	STD_LOGIC; -- input for bootloader
-		TOPclock                             : IN    STD_LOGIC; -- must go through pll
+		enableDebug, switchSEL, switchSEL2   : IN    STD_LOGIC; -- input for debuger
+		TOPclock                             : IN    STD_LOGIC; --must go through pll
 		buttonClock                          : IN    STD_LOGIC;
-		reset                                : IN    STD_LOGIC;
-		rx												 : IN 	STD_LOGIC;
+		reset                                : IN    STD_LOGIC;                                    --SW0
+
 		-- OUTPUTS
 		TOPdisplay1                          : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x80000004
 		TOPdisplay2                          : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x80000008
-		TOPleds                              : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);					 --0x8000000c
-		tx												 : OUT 	STD_LOGIC;
-		-- SDRAM
+		TOPleds                              : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x8000000c
+
 		SDRAM_ADDR                           : OUT   STD_LOGIC_VECTOR (12 DOWNTO 0);               -- Address
 		SDRAM_DQ                             : INOUT STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0); -- data input / output
 		SDRAM_BA                             : OUT   STD_LOGIC_VECTOR (1 DOWNTO 0);                -- BA0 / BA1 ?
@@ -36,7 +33,8 @@ architecture VHDL of TestBench is
 		SDRAM_RAS_N, SDRAM_CAS_N, SDRAM_WE_N : OUT   STD_LOGIC;                                    -- RAS + CAS + WE = CMD
 		SDRAM_CKE, SDRAM_CS_N                : OUT   STD_LOGIC;                                    -- CKE (clock rising edge) | CS ?
 		SDRAM_CLK                            : OUT   STD_LOGIC
-		
+
+
 	);
 	end component;
 
@@ -47,8 +45,7 @@ architecture VHDL of TestBench is
 	signal load, store : std_logic;
 	signal dataLength : std_logic_vector(2 downto 0);
 	signal inputData, outputData: std_logic_vector(31 downto 0);
-	signal sigtx : std_logic;
-
+	
 	-- SDRAM SIMULATION --
 	signal outputData_SDRAM, inputData_SDRAM: std_logic_vector(15 downto 0);
 	signal AddrSDRAM, AddrSDRAM2, AddrSDRAM3, AddrSDRAM4, AddrSDRAM5, AddrSDRAM6: std_logic_vector(24 downto 0);
@@ -91,18 +88,11 @@ architecture VHDL of TestBench is
 		reset        	 => reset,
 		TOPdisplay1     => SigTOPdisplay1,
 		TOPdisplay2     => SigTOPdisplay2,
-		rx					 => '0',
 		
 		enableDebug 	 => '0',
-		SW8		 		 => '0',
-		SW7		 		 => '0',
-		SW6		 		 => '0',
-		SW5		 		 => '0',
-		SW4		 		 => '0',
-		SW3		 		 => '0',
-		switchBoot 		 => '0',
-		buttonClock		 => '0',
-		tx					 => sigtx
+		switchSEL		 => '0',
+		switchSEL2      => '0',
+		buttonClock		 => '0'
 		
 	);
     
