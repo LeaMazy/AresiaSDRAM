@@ -140,18 +140,21 @@ BEGIN
 	altpll_component : altpll
 	GENERIC MAP (
 		bandwidth_type => "AUTO",
+		--
 		clk0_divide_by => 50,
 		clk0_duty_cycle => 50,
 		clk0_multiply_by => 1,
 		clk0_phase_shift => "0",
 		compensate_clock => "CLK0",
 		inclk0_input_frequency => 20000,
+		--
 --		clk0_divide_by => 5,   --50M/5
 --		clk0_duty_cycle => 50, --50%
 --		clk0_multiply_by => 4, --50M/5*4 = 40M
 --		clk0_phase_shift => "0",
 --		compensate_clock => "CLK0",
 --		inclk0_input_frequency => 20000,
+		--
 		intended_device_family => "MAX 10",
 		lpm_hint => "CBX_MODULE_PREFIX=clock1M",
 		lpm_type => "altpll",

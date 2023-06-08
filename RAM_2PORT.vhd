@@ -50,7 +50,7 @@ ENTITY RAM_2PORT IS
 		enable		: IN STD_LOGIC  := '1';
 		wren_a		: IN STD_LOGIC  := '0';
 		wren_b		: IN STD_LOGIC  := '0';
-		dq    	 : IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
+--		dq    	 : IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
 		q_a		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 		q_b		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 	);

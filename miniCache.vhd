@@ -48,20 +48,35 @@ END ENTITY;
 architecture archi of miniCache is
 
 
+--COMPONENT RAM_2PORT IS
+--PORT (
+--	address_a : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
+--	address_b : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
+--	clock     : IN  STD_LOGIC := '1';
+--	data_a    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
+--	data_b    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
+--	enable    : IN  STD_LOGIC := '1';
+--	wren_a    : IN  STD_LOGIC := '0';
+--	wren_b    : IN  STD_LOGIC := '0';
+--	q_a       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+--	q_b       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+--);
+--END COMPONENT;
+
 COMPONENT RAM8x4 IS
-	PORT (
-		address_a : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
-		address_b : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
-		clock     : IN  STD_LOGIC := '1';
-		data_a    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
-		data_b    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
-		enable    : IN  STD_LOGIC := '1';
-		wren_a    : IN  STD_LOGIC := '0';
-		wren_b    : IN  STD_LOGIC := '0';
-		dq    	 : IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
-		q_a       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
-		q_b       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
-	);
+		PORT (
+			address_a : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
+			address_b : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
+			clock     : IN  STD_LOGIC := '1';
+			data_a    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
+			data_b    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
+			enable    : IN  STD_LOGIC := '1';
+			wren_a    : IN  STD_LOGIC := '0';
+			wren_b    : IN  STD_LOGIC := '0';
+			dq    	 : IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
+			q_a       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+			q_b       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+		);
 	END COMPONENT;
 
 ----------------------SIGNALS SDRAM MEMORY/PROC RISCV----------------------------
@@ -97,16 +112,10 @@ CONSTANT SizeSRAM                                    : INTEGER := 1023;
 
 TYPE stateInit IS (WAITING, cpy, next_Addr, stop);
 SIGNAL currentStateInit, nextStateInit : stateInit;
-
-
 ---------------------------------------------------------------------------------
--------------------------------SIGNALS SRAM-------------------------------------
----------------------------------------------------------------------------------
-
 
 begin
 
-	
 	------------------------------------------------------------
 	----------------------MUX OUTPUT----------------------------
 	------------------------------------------------------------
@@ -291,25 +300,36 @@ begin
 					SIGcptAddr WHEN rising_edge(clock);
 					
 -----------------------------------------------------------------
-Memory : RAM8x4
-PORT MAP(
-	-- address_a => PROCprogcounter(13 downto 2),  --  Addr instruction (divided by 4 because we use 32 bits memory)
-	address_a => RcptAddr(13 DOWNTO 2),
-	-- address_b => PROCaddrDM(13 downto 2),       --  Addr memory (divided by 4 because we use 32 bits memory)
-	address_b => (OTHERS => '0'),
-	clock     => clock,
-	data_a    => (OTHERS => '0'), 		-- Instruction in
-	-- data_b    => PROCinputDM,  	-- Data in
-	data_b    => (OTHERS => '0'),
-	enable    => '1',						-- ChipSelect for SRAM
-	wren_a    => '0',       -- Write Instruction Select
-	-- wren_b    => PROCstore,       -- Write Data Select
-	wren_b    => '0',
-	--dq			 => SIGMEMdq,
-	dq			 => (OTHERS => '0'),
-	-- q_a       => Muxinstruction -- DataOut Instruction
-	q_a       => SIGinstructionInit
-	-- q_b       => Muxdata		-- DataOut Data
-);
+		
+--Memory : RAM_2PORT
+--PORT MAP(
+--	address_a => RcptAddr(13 DOWNTO 2), --  Addr instruction (divided by 4 because we use 32 bits memory)
+--	address_b => (OTHERS => '0'),       --  Addr memory (divided by 4 because we use 32 bits memory)
+--	clock     => clock,
+--	data_a    => (OTHERS => '0'), -- Instruction in
+--	data_b    => (OTHERS => '0'), -- Data in
+--	enable    => '1',
+--	wren_a    => '0',           -- Write Instruction Select
+--	wren_b    => '0',           -- Write Data Select
+--	q_a       => SIGinstructionInit -- DataOut Instruction
+--	--q_b       => SIGoutputDM 						-- DataOut Data
+--);
+
+	Memory : RAM8x4
+	PORT MAP(
+		address_a => RcptAddr(13 DOWNTO 2),  --  Addr instruction (divided by 4 because we use 32 bits memory)
+		address_b => (OTHERS => '0'),       --  Addr memory (divided by 4 because we use 32 bits memory)
+		clock     => clock,
+		data_a    => (OTHERS => '0'), 		-- Instruction in
+		data_b    => (OTHERS => '0'),  	-- Data in
+		enable    => '1',						-- ChipSelect for SRAM
+		wren_a    => '0',       -- Write Instruction Select
+		wren_b    => '0',       -- Write Data Select
+		dq			 => (OTHERS => '0'),
+--		dq			 => SIGMEMdq,
+		q_a       => SIGinstructionInit -- DataOut Instruction
+--		q_b       => SIGoutputDM		-- DataOut Data
+	);
 END archi;
+
 -- END FILE

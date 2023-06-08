@@ -9,7 +9,11 @@ vlog -vlog01compat -work work +incdir+C:/ECE/Aresia/TestProcGit/AresiaSDRAM/db {
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/SDRAM_package.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/simul_var_pkg.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/SegmentDecoder.vhd}
-vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM_2PORT.vhd}
+vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM8x4.vhd}
+vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM8_3.vhd}
+vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM8_2.vhd}
+vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM8_1.vhd}
+vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM8_0.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/ProgramCounter.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/Processor.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/InstructionDecoder.vhd}

@@ -3,8 +3,8 @@ USE ieee.std_logic_1164.all;
 
 ENTITY uart IS
 	GENERIC(
-		clk_freq		:	INTEGER		:= 1_000_000;		--frequency of system clock in Hertz
-		baud_rate	:	INTEGER		:= 9_600;		--data link baud rate in bits/second
+		clk_freq		:	INTEGER		:= 40_000_000;		--frequency of system clock in Hertz
+		baud_rate	:	INTEGER		:= 115_200;		--data link baud rate in bits/second
 		d_width		:	INTEGER		:= 8; 			--data bus width
 		parity		:	INTEGER		:= 0;			--0 for no parity, 1 for parity
 		parity_eo	:	STD_LOGIC	:='0');		--'0' for even, '1' for odd parity

@@ -91,7 +91,6 @@ BEGIN
 		enable => enable,
 		wren_a => wren_a,
 		wren_b => dq(0),
---		wren_b => wren_b,
 		q_a => q_a(7 downto 0),
 		q_b => q_b(7 downto 0)
 	);
@@ -105,7 +104,6 @@ BEGIN
 		enable => enable,
 		wren_a => wren_a,
 		wren_b => dq(1),
---		wren_b => wren_b,
 		q_a => q_a(15 downto 8),
 		q_b => q_b(15 downto 8)
 	);
@@ -119,7 +117,6 @@ BEGIN
 		enable => enable,
 		wren_a => wren_a,
 		wren_b => dq(2),
---		wren_b => wren_b,
 		q_a => q_a(23 downto 16),
 		q_b => q_b(23 downto 16)
 	);
@@ -133,7 +130,6 @@ BEGIN
 		enable => enable,
 		wren_a => wren_a,
 		wren_b => dq(3),
---		wren_b => wren_b,
 		q_a => q_a(31 downto 24),
 		q_b => q_b(31 downto 24)
 	);

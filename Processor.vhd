@@ -24,7 +24,10 @@ ENTITY Processor IS
 		PROCfunct3      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		PROCaddrDM      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 		PROCinputDM     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		PROCdq     		 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+		PROCdq     		 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+		PROCRFin			 : OUT STD_LOGIC_VECTOR(31 downto 0);
+		PROCRFout1		 : OUT STD_LOGIC_VECTOR(31 downto 0);
+	   PROCRFout2		 : OUT STD_LOGIC_VECTOR(31 downto 0)
 	);
 END ENTITY;
 
@@ -317,6 +320,10 @@ BEGIN
 	    		(others=>'0');
 				
 	PROCdq <= SIGPROCdq when (SIGstore='1') else "0000";
+	PROCRFin 		<= SIGinputRF;
+	PROCRFout1		<= SIGoutput1RF;
+	PROCRFout2		<= SIGoutput2RF;
+	
 	-- INSTANCES
 	
 	instPC : ProgramCounter
@@ -400,15 +407,15 @@ BEGIN
 	
 	instALIGNMENT : Alignment
 	PORT MAP(
-		IDfunct3 => SIGfunct3,
-		q_b => PROCoutputDM,
-		IDimm12I => SIGimm12I,
-		IDimm12S => SIGimm12S,
+		IDfunct3 	 => SIGfunct3,
+		q_b 			 => PROCoutputDM,
+		IDimm12I 	 => SIGimm12I,
+		IDimm12S 	 => SIGimm12S,
 		RF_Align_out => SIGoutput2RF,
-		PROCaddrDM => SIGoutputALU,
-		DQ => SIGPROCdq,
-		RF_Align_in => SIG_RF_Align_in,
-		PROCinputDM => PROCinputDM
+		PROCaddrDM 	 => SIGoutputALU,
+		DQ 			 => SIGPROCdq,
+		RF_Align_in  => SIG_RF_Align_in,
+		PROCinputDM  => PROCinputDM
 	);
 
 	-- END

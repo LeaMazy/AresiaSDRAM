@@ -9,24 +9,24 @@ USE ieee.numeric_std.ALL;
 USE work.simulPkg.ALL;
 USE work.SDRAM_package.ALL;
 
+
 -- ENTITY
 ENTITY Top IS
 	PORT (
 		-- INPUTS
-		enableDebug, switchSEL, switchSEL2   : IN    STD_LOGIC; -- input for debuger
+		enableDebug									 : IN    STD_LOGIC; -- debugger mode
+		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN    STD_LOGIC; -- inputs for debuger
 		switchBoot									 : IN 	STD_LOGIC; -- input for bootloader
-		TOPclock                             : IN    STD_LOGIC; --must go through pll
+		TOPclock                             : IN    STD_LOGIC; -- must go through pll
 		buttonClock                          : IN    STD_LOGIC;
 		reset                                : IN    STD_LOGIC;
 		rx												 : IN 	STD_LOGIC;
-		--SW0
-
 		-- OUTPUTS
 		TOPdisplay1                          : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x80000004
 		TOPdisplay2                          : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);                --0x80000008
 		TOPleds                              : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);					 --0x8000000c
 		tx												 : OUT 	STD_LOGIC;
-		
+		-- SDRAM
 		SDRAM_ADDR                           : OUT   STD_LOGIC_VECTOR (12 DOWNTO 0);               -- Address
 		SDRAM_DQ                             : INOUT STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0); -- data input / output
 		SDRAM_BA                             : OUT   STD_LOGIC_VECTOR (1 DOWNTO 0);                -- BA0 / BA1 ?
@@ -34,7 +34,7 @@ ENTITY Top IS
 		SDRAM_RAS_N, SDRAM_CAS_N, SDRAM_WE_N : OUT   STD_LOGIC;                                    -- RAS + CAS + WE = CMD
 		SDRAM_CKE, SDRAM_CS_N                : OUT   STD_LOGIC;                                    -- CKE (clock rising edge) | CS ?
 		SDRAM_CLK                            : OUT   STD_LOGIC
-	
+		
 	);
 END ENTITY;
 
@@ -60,7 +60,10 @@ ARCHITECTURE archi OF Top IS
 			PROCfunct3      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			PROCaddrDM      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			PROCinputDM     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-			PROCdq 			 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+			PROCdq 			 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+			PROCRFin			 : OUT STD_LOGIC_VECTOR(31 downto 0);
+			PROCRFout1		 : OUT STD_LOGIC_VECTOR(31 downto 0);
+			PROCRFout2		 : OUT STD_LOGIC_VECTOR(31 downto 0)
 		);
 	END COMPONENT;
 
@@ -121,15 +124,18 @@ ARCHITECTURE archi OF Top IS
 	COMPONENT DEBUGER IS
 		PORT (
 			-- INPUTS
-			enable                : IN  STD_LOGIC;
-			SwitchSel, SwitchSel2 : IN  STD_LOGIC;
+			enable                		  : IN  STD_LOGIC;
+			SW8, SW7, SW6, SW5, SW4, SW3 : IN  STD_LOGIC;
 			--reset    	: IN STD_LOGIC; --SW0
-			PCregister            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			Instruction           : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+			PCregister            	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			Instruction           	: IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+			RFin			: IN STD_LOGIC_VECTOR(31 downto 0);
+			RFout1		: IN STD_LOGIC_VECTOR(31 downto 0);
+			RFout2		: IN STD_LOGIC_VECTOR(31 downto 0);
 
 			--OUTPUTS
-			TOPdisplay2           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1'); --0x80000008
-			TOPdisplay1           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1')  --0x80000004
+			TOPdisplay2           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1'); --0x80000008
+			TOPdisplay1           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1')  --0x80000004
 		);
 	END COMPONENT;
 	
@@ -160,84 +166,85 @@ ARCHITECTURE archi OF Top IS
 		tx			:	OUT	STD_LOGIC
 	);
 	END component;
-
+	
+	
 	COMPONENT SDRAM_32b IS
-	PORT (
-		-- SDRAM Inputs
-		Clock, Reset     : IN  STD_LOGIC;
-		-- Inputs (32bits)
-		IN_Address       : IN  STD_LOGIC_VECTOR(25 DOWNTO 0);
-		IN_Write_Select  : IN  STD_LOGIC;
-		IN_Data_32       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-		IN_Select        : IN  STD_LOGIC;
-		IN_Function3     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-		-- Outputs (16b)
-		OUT_Address      : OUT STD_LOGIC_VECTOR(24 DOWNTO 0);
-		OUT_Write_Select : OUT STD_LOGIC;
-		OUT_Data_16      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		OUT_Select       : OUT STD_LOGIC;
-		OUT_DQM          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-		-- Test Outputs (32bits)
-		Ready_32b        : OUT STD_LOGIC;
-		Data_Ready_32b   : OUT STD_LOGIC;
-		DataOut_32b      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		-- Test Outputs (16bits)
-		Ready_16b        : IN  STD_LOGIC;
-		Data_Ready_16b   : IN  STD_LOGIC;
-		DataOut_16b      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0)
-	);
+		PORT (
+			-- SDRAM Inputs
+			Clock, Reset     : IN  STD_LOGIC;
+			-- Inputs (32bits)
+			IN_Address       : IN  STD_LOGIC_VECTOR(25 DOWNTO 0);
+			IN_Write_Select  : IN  STD_LOGIC;
+			IN_Data_32       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+			IN_Select        : IN  STD_LOGIC;
+			IN_Function3     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			-- Outputs (16b)
+			OUT_Address      : OUT STD_LOGIC_VECTOR(24 DOWNTO 0);
+			OUT_Write_Select : OUT STD_LOGIC;
+			OUT_Data_16      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			OUT_Select       : OUT STD_LOGIC;
+			OUT_DQM          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			-- Test Outputs (32bits)
+			Ready_32b        : OUT STD_LOGIC;
+			Data_Ready_32b   : OUT STD_LOGIC;
+			DataOut_32b      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			-- Test Outputs (16bits)
+			Ready_16b        : IN  STD_LOGIC;
+			Data_Ready_16b   : IN  STD_LOGIC;
+			DataOut_16b      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0)
+		);
 	END COMPONENT;
 
 	COMPONENT SDRAM_controller IS
-	PORT (
-		clk, Reset                           : IN    STD_LOGIC;
-		SDRAM_ADDR                           : OUT   STD_LOGIC_VECTOR (12 DOWNTO 0);               -- Address
-		SDRAM_DQ                             : INOUT STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0); -- data input / output
-		SDRAM_BA                             : OUT   STD_LOGIC_VECTOR (1 DOWNTO 0);                -- BA0 / BA1 ?
-		SDRAM_DQM                            : OUT   STD_LOGIC_VECTOR ((DQM_WIDTH - 1) DOWNTO 0);  -- LDQM ? UDQM ?
-		SDRAM_RAS_N, SDRAM_CAS_N, SDRAM_WE_N : OUT   STD_LOGIC;                                    -- RAS + CAS + WE = CMD
-		SDRAM_CKE, SDRAM_CS_N                : OUT   STD_LOGIC;                                    -- CKE (clock rising edge) | CS ?
-		SDRAM_CLK                            : OUT   STD_LOGIC;
-		Data_OUT                             : OUT   STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0);
-		Data_IN                              : IN    STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0);
-		DQM                                  : IN    STD_LOGIC_VECTOR ((DQM_WIDTH - 1) DOWNTO 0);
-		Address_IN                           : IN    STD_LOGIC_VECTOR (24 DOWNTO 0);
-		Write_IN                             : IN    STD_LOGIC;
-		Select_IN                            : IN    STD_LOGIC;
-		Ready                                : OUT   STD_LOGIC;
-		Data_Ready                           : OUT   STD_LOGIC
-	);
+		PORT (
+			clk, Reset                           : IN    STD_LOGIC;
+			SDRAM_ADDR                           : OUT   STD_LOGIC_VECTOR (12 DOWNTO 0);               -- Address
+			SDRAM_DQ                             : INOUT STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0); -- data input / output
+			SDRAM_BA                             : OUT   STD_LOGIC_VECTOR (1 DOWNTO 0);                -- BA0 / BA1 ?
+			SDRAM_DQM                            : OUT   STD_LOGIC_VECTOR ((DQM_WIDTH - 1) DOWNTO 0);  -- LDQM ? UDQM ?
+			SDRAM_RAS_N, SDRAM_CAS_N, SDRAM_WE_N : OUT   STD_LOGIC;                                    -- RAS + CAS + WE = CMD
+			SDRAM_CKE, SDRAM_CS_N                : OUT   STD_LOGIC;                                    -- CKE (clock rising edge) | CS ?
+			SDRAM_CLK                            : OUT   STD_LOGIC;
+			Data_OUT                             : OUT   STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0);
+			Data_IN                              : IN    STD_LOGIC_VECTOR ((DATA_WIDTH - 1) DOWNTO 0);
+			DQM                                  : IN    STD_LOGIC_VECTOR ((DQM_WIDTH - 1) DOWNTO 0);
+			Address_IN                           : IN    STD_LOGIC_VECTOR (24 DOWNTO 0);
+			Write_IN                             : IN    STD_LOGIC;
+			Select_IN                            : IN    STD_LOGIC;
+			Ready                                : OUT   STD_LOGIC;
+			Data_Ready                           : OUT   STD_LOGIC
+		);
 	END COMPONENT;
-	
 	COMPONENT miniCache IS
-	PORT (
-		-- INPUTS
-		clock             : IN  STD_LOGIC;
-		reset             : IN  STD_LOGIC;
-		bootfinish			: out std_logic;
+		PORT (
+			-- INPUTS
+			clock             : IN  STD_LOGIC;
+			reset             : IN  STD_LOGIC;
+			bootfinish			: out std_logic;
 
-		------------------------ TO PROC -----------------------
-		PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		PROCoutputDM      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		PROChold          : OUT STD_LOGIC;
-		----------------------- FROM PROC ----------------------
-		PROCprogcounter   : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-		PROCstore         : IN  STD_LOGIC;
-		PROCload          : IN  STD_LOGIC;
-		PROCfunct3        : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-		PROCaddrDM        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-		PROCinputDM       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+			------------------------ TO PROC -----------------------
+			PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			PROCoutputDM      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			PROChold          : OUT STD_LOGIC;
+			----------------------- FROM PROC ----------------------
+			PROCprogcounter   : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+			PROCstore         : IN  STD_LOGIC;
+			PROCload          : IN  STD_LOGIC;
+			PROCfunct3        : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			PROCaddrDM        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+			PROCinputDM       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-		-------------------- TO SDRAM 32 ----------------------
-		funct3            : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-		writeSelect, csDM : OUT STD_LOGIC;
-		AddressDM, inputDM  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		-------------------- FROM SDRAM 32 --------------------
-		Ready_32b         : IN  STD_LOGIC;
-		Data_Ready_32b    : IN  STD_LOGIC;
-		DataOut_32b       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
-	);
+			-------------------- TO SDRAM 32 ----------------------
+			funct3            : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			writeSelect, csDM : OUT STD_LOGIC;
+			AddressDM, inputDM  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			-------------------- FROM SDRAM 32 --------------------
+			Ready_32b         : IN  STD_LOGIC;
+			Data_Ready_32b    : IN  STD_LOGIC;
+			DataOut_32b       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
+		);
 	END COMPONENT;
+
 
 	--------STATE MACHINES	
 	TYPE BootMemMachine IS (idle, R1, R2, R3);	--state machine to force reset when boot mode is activated/desactivated
@@ -268,6 +275,10 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGPROCfunct3 				: STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL SIGPROCaddrDM 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL SIGPROCinputDM 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL SIGPROCRFin 					: STD_LOGIC_VECTOR(31 DOWNTO 0);			 
+	SIGNAL SIGPROCRFout1	 				: STD_LOGIC_VECTOR(31 DOWNTO 0);	 
+	SIGNAL SIGPROCRFout2	 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	
 	SIGNAL SIGfunct3 						: STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL SIGcsDM, SIGwriteSelect   : STD_LOGIC;
 	SIGNAL SIGinputDM, SIGAddressDM  : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -276,7 +287,6 @@ ARCHITECTURE archi OF Top IS
 	
 	--Store/Load SRAM
 	SIGNAL SIGMEMcs	 	 	 : std_logic;
-	SIGNAL MuxPROCstore_a  : STD_LOGIC;
 	SIGNAL MuxPROCstore_b  : STD_LOGIC;
 	SIGNAL SIGPROCdq		: STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL SIGMEMdq		: STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -296,7 +306,6 @@ ARCHITECTURE archi OF Top IS
 	--Displayer
 	SIGNAL SIGdispCS	 	 	 : std_logic;
 	
-
 	-- Outputs to SDRAM controlle(16b)
 	SIGNAL SIGOUT_Address                                : STD_LOGIC_VECTOR(24 DOWNTO 0);
 	SIGNAL SIGOUT_Write_Select                           : STD_LOGIC;
@@ -307,8 +316,11 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGReady_16b                                  : STD_LOGIC;
 	SIGNAL SIGData_Ready_16b                             : STD_LOGIC;
 	SIGNAL SIGDataOut_16b                                : STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL SIGbootfinish	 										  : STD_LOGIC;
+
 	
-	SIGNAL SIGbootfinish	 				: std_logic;
+
+
 	
 	
 BEGIN
@@ -344,16 +356,14 @@ BEGIN
 	
 	-- Sram specific signal
 	-- avoid writing in memory when the proc wants to write on its outputs
-	MuxPROCstore_a <= --SIGPROCstore WHEN SIGPROCaddrDM(31)='0' and SIGboot='1' ELSE
-							'0';
 	MuxPROCstore_b <= '0' WHEN SIGPROCaddrDM(31)='1' ELSE
 							SIGPROCstore;
 	SIGMEMdq <= (others => '0') WHEN SIGMEMcs='0' else SIGPROCdq;
 	--
 
 	SIGclock    <= TOPclock WHEN SIGsimulOn = '1' ELSE
-						buttonClock WHEN enableDebug = '1' AND SIGbootfinish='1' ELSE
-						SIGPLLclock;
+								buttonClock WHEN enableDebug = '1' AND SIGbootfinish='1' ELSE
+								SIGPLLclock;
 
 	TOPdisplay1 <= procDisplay1 WHEN enableDebug = '0' ELSE
 		            debugDisplay1;
@@ -383,11 +393,17 @@ BEGIN
 	PORT MAP(
 		--TOPclock =>
 		enable      => enableDebug,
-		SwitchSel   => switchSEL,
-		SwitchSel2  => switchSEL2,
-		--reset => 
+		SW8			=> SW8, 
+		SW7			=> SW7, 
+		SW6			=> SW6, 
+		SW5			=> SW5, 
+		SW4			=> SW4,
+		SW3			=> SW3,
 		PCregister  => SIGPROCPC(15 DOWNTO 0),
 		Instruction => SIGinstMux,
+		RFin			=> SIGPROCRFin,
+		RFout1		=> SIGPROCRFout1,
+	   RFout2		=> SIGPROCRFout2,
 		--OUTPUTS
 		TOPdisplay2 => debugDisplay2,
 		TOPdisplay1 => debugDisplay1
@@ -409,7 +425,10 @@ BEGIN
 		PROCfunct3      => SIGPROCfunct3,
 		PROCaddrDM      => SIGPROCaddrDM,
 		PROCinputDM     => SIGPROCinputDM,
-		PROCdq 			 => SIGPROCdq
+		PROCdq 			 => SIGPROCdq,
+		PROCRFin			 => SIGPROCRFin,
+		PROCRFout1		 => SIGPROCRFout1,
+	   PROCRFout2		 => SIGPROCRFout2
 	);
 
 	instCPT : Counter
@@ -476,7 +495,6 @@ BEGIN
 		clk		=> SIGclock,
 		reset	=> TOPreset,
 		data_in  => SIGPROCinputDM,
-		
 		uartload	=> SIGPROCload,
 		uartstore => SIGPROCstore,
 		addOutMP	=> SIGPROCaddrDM,
@@ -485,8 +503,6 @@ BEGIN
 		data_out => SIGUARTOut,
 		tx			=> tx
 	);
-
-	
 	
 	SDRAMconverter : SDRAM_32b
 	PORT MAP(
@@ -571,7 +587,7 @@ BEGIN
 	);
 	
 	
-	
+
 	SIGbootMux <= switchBoot when currentState=R1 else 
 					  SIGbootReg;
 	SIGbootReg <= SIGbootMux when rising_edge(SIGclock);

@@ -15,7 +15,7 @@ package simulPkg is
 	SIGNAL PKG_SDRAMselect      : std_logic;
 	SIGNAL PKG_DQM_SDRAM			 : std_logic_vector(1 downto 0);
 	SIGNAL PKG_SDRAMwrite       : std_logic;
-	
+	SIGNAL PKG_outputInstr      : std_logic_vector(31 downto 0);
 
 	signal PKG_store       : std_logic;
 	signal PKG_load        : std_logic;

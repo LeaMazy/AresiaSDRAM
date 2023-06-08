@@ -37,8 +37,8 @@ architecture archi of Alignment is
 
 begin
 	-- Store
-	shiftS <= (IDimm12S(2 downto 0)) when PROCaddrDM(1 downto 0)="00" else
-				('0' & PROCaddrDM(1 downto 0)); --ICI CONTINUE ICICIIIIIIIIIIIIII
+	shiftS 	 <= (IDimm12S(2 downto 0)) when PROCaddrDM(1 downto 0)="00" else
+				    ('0' & PROCaddrDM(1 downto 0)); 
 	storetype <= ("00" & shiftS(1 downto 0)) WHEN (IDfunct3 = "000" )	-- StoreByte (RAMs)
 			else ("01" & shiftS(1 downto 0)) WHEN (IDfunct3 = "001")	-- StoreHalf (RAM3&2 ou RAM1&0)
 			else ('1' & shiftS(2 downto 0)) WHEN (IDfunct3 = "010") -- StoreWord (RAM0)
@@ -72,7 +72,7 @@ begin
 				
 	shiftL <= 0 when (IDimm12I="111111111111" and (PROCaddrDM(1 downto 0)="00"))  else
 				(to_integer(unsigned(IDimm12I(1 downto 0)))) when PROCaddrDM(1 downto 0)="00" else
-				(to_integer(unsigned(PROCaddrDM(1 downto 0)))); --ICI CONTINUE ICICIIIIIIIIIIIIII
+				(to_integer(unsigned(PROCaddrDM(1 downto 0))));
 	RF_Align <= std_logic_vector(shift_right(unsigned(q_b),16) ) 						
 					when (IDfunct3 = "101" and ((IDimm12I(1)='1') 
 													or	((IDimm12I(1)='0') and PROCaddrDM(1 downto 0)/="00"))) -- LHU (Imm%2=0 & Imm%4!=0)
