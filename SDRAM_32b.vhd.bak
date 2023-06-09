@@ -226,7 +226,7 @@ DQM <= "0000" when Mux_IN_Function3 = "10" 										  			 else  -- 4 octets
 DataOut_32b <= SIGDataOut_32b; 
 
 SIGDataOut_32b	<= (others=> '0') when reset='1' else
-				   Mux_data32 when rising_edge(clock);
+				   Reg_DataOut when rising_edge(clock);
 				   
 -----MUX for char 
 -- behaviour : We want a byte or a half word of a 4-byte word (represented by a 0 --> DQM)

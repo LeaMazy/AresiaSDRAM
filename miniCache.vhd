@@ -108,7 +108,7 @@ SIGNAL SIGinstructionInit : STD_LOGIC_VECTOR(31 downto 0);   -- transmits instru
 SIGNAL funct3boot                                    : STD_LOGIC_VECTOR(2 DOWNTO 0);
 SIGNAL inputDMboot             : STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL SIGstoreboot, csDMboot                        : STD_LOGIC;
-CONSTANT SizeSRAM                                    : INTEGER := 1023;
+CONSTANT SizeSRAM                                    : INTEGER := 4096;
 
 TYPE stateInit IS (WAITING, cpy, next_Addr, stop);
 SIGNAL currentStateInit, nextStateInit : stateInit;
