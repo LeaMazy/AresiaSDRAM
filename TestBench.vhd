@@ -63,6 +63,9 @@ architecture VHDL of TestBench is
 	type mem is array(0 to 2047) of std_logic_vector(15 downto 0);
 	signal TabMemory : mem :=(others => (others => '0'));
 	
+	signal sigBoot : std_logic;
+
+	
 															 
 
 	BEGIN
@@ -100,7 +103,7 @@ architecture VHDL of TestBench is
 		SW5		 		 => '0',
 		SW4		 		 => '0',
 		SW3		 		 => '0',
-		switchBoot 		 => '0',
+		switchBoot 		 => sigBoot,
 		buttonClock		 => '0',
 		tx					 => sigtx
 		
@@ -188,6 +191,25 @@ architecture VHDL of TestBench is
 			reset <= '1';
 			wait for 2 ns;
 			reset <= '0';
+			wait;
+		end process;
+		
+	bootTestbench: process
+		begin
+		--init  simulation
+   		sigBoot <= '0';
+   		wait for 500 ns;
+			sigBoot <= '1';
+			wait for 5100 ns;
+   		sigBoot <= '0';
+--			wait for 12100 ns;
+--			sigBoot <= '1';
+--			wait for 10100 ns;
+--   		sigBoot <= '0';
+--			wait for 12100 ns;
+--			sigBoot <= '1';
+--			wait for 10100 ns;
+--   		sigBoot <= '0';
 			wait;
 		end process;
 END vhdl;

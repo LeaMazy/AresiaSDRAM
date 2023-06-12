@@ -21,11 +21,7 @@ end entity;
 
 -- ARCHITECTURE
 architecture archi of Bootloader is
---	TYPE ROM IS ARRAY(0 TO 11) OF std_logic_vector(0 to 31);
---	TYPE ROM IS ARRAY(0 TO 20) OF std_logic_vector(0 to 31);
---	TYPE ROM IS ARRAY(0 TO 23) OF std_logic_vector(0 to 31);
 	TYPE ROM IS ARRAY(0 TO 71) OF std_logic_vector(0 to 31);
-
 	SIGNAL rom_block : ROM :=(
 		x"00001137" , x"00c000ef" , x"00100073" , x"0000006f" , x"80000737" , x"000107b7" , x"fff78793" , x"00f72423",
 		x"83c0c7b7" , x"08778793" , x"00f72223" , x"01800693" , x"00000313" , x"c0000737" , x"ff800613" , x"00072783",
@@ -36,28 +32,15 @@ architecture archi of Bootloader is
 		x"ffc88893" , x"00b62023" , x"01800693" , x"00d5d633" , x"0ff67613" , x"00072783" , x"0017f793" , x"fe079ce3",
 		x"00c72223" , x"ff868693" , x"ff0692e3" , x"fa1ff06f" , x"00000693" , x"c0000737" , x"00001637" , x"ffc60613",
 		x"00072783" , x"0017f793" , x"fe079ce3" , x"0006c783" , x"00f72223" , x"00168693" , x"fec694e3" , x"0000006f"
-		
---		x"00001137" , x"00c000ef" , x"00100073" , x"0000006f" , x"80000737" , x"000107b7" , x"fff78793" , x"00f72423",
---		x"83c0c7b7" , x"08778793" , x"00f72223" , x"0000006f"
-
---		x"00001137" , x"00c000ef" , x"00100073" , x"0000006f" , x"80000737" , x"000107b7" , x"fff78793" , x"00f72423",
---		x"83c0c7b7" , x"08778793" , x"00f72223" , x"00400693" , x"c0000737" , x"00072783" , x"0047f793" , x"fe078ce3",
---		x"00472603" , x"00072783" , x"0017f793" , x"fe079ce3" , x"00c72223" , x"fff68693" , x"fc069ee3" , x"0000006f"
-
---		x"00001137" , x"00c000ef" , x"00100073" , x"0000006f" , x"80000737" , x"000107b7" , x"fff78793" , x"00f72423",
---		x"83c0c7b7" , x"08778793" , x"00f72223" , x"c0000737" , x"00072783" , x"0047f793" , x"fe078ce3" , x"00472683",
---		x"00072783" , x"0017f793" , x"fe079ce3" , x"00d72223" , x"fe1ff06f"
 	);
 	
 	signal sigad : integer;
-	signal sigpc : std_logic_vector(11 downto 0) := "000000000000";
+	signal sigpc : std_logic_vector(11 downto 0);
 	
 	begin
 		sigpc <= addrInstBoot(11 downto 0);
 		instBoot <= rom_block(sigad) when rising_edge(clk);
-		sigad <= 0 when (CS ='1' and sigpc=x"FFF") else 
-					(to_integer(unsigned(sigpc))) when (CS ='1' and (unsigned(sigpc) < 72)) else 
-					71;
+		sigad <= 71 when ((unsigned(sigpc) > 71)) else to_integer(unsigned(sigpc));
 	
 end archi;
 -- END FILE

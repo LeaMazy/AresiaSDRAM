@@ -568,7 +568,7 @@ BEGIN
 		PROChold         => SIGPROChold,
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
-		PROCstore        => SIGPROCstore,
+		PROCstore        => MuxPROCstore_b, --SIGPROCstore,
 		PROCload         => SIGPROCload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,

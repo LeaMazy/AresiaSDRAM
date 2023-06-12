@@ -155,7 +155,7 @@ begin
 	
 	FSM_SDRAMmemory : PROCESS (ready_32b, PROCLoad, PROCstore, currentState, data_Ready_32b, dataOut_32b, currentStateInit, Reginstruction, PROCaddrDM)
 	BEGIN
-		SIGHold <='1'; -- hold at 1 = blocked
+		SIGHold <='0'; -- hold at 1 = blocked
 		nextState <= currentState;
 		SIGinstruction <= Reginstruction;
 		SIGstore 		<= '0';  --- store at 0 = read / store at 1 = store
@@ -164,12 +164,13 @@ begin
 		CASE currentState IS
    ------------------- INIT -----------------------
 			WHEN INIT => --waiting for the end of the bootloader
+				SIGHold <='1';
 				IF currentStateInit=Stop AND Ready_32b = '1' THEN
 					nextstate <= IDLE;
 				END IF;
   ------------------- IDLE -----------------------
 			WHEN IDLE =>
-			
+				SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold <='0'; 
 					SIGcsDMCache <= '1';
@@ -185,7 +186,7 @@ begin
 				END IF;		
 ------------------- LOADdataGet -----------------------
 			WHEN LOADdataGet =>
-				
+				SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold      <= '0'; -- TEST
 					SIGstore     <= '0';
@@ -195,6 +196,7 @@ begin
 					
 ------------------- STOREdataEnd -----------------------
 			WHEN STOREdataEnd =>
+				SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGstore      <= '0';
 					SIGcsDMCache  <= '1';
@@ -202,7 +204,7 @@ begin
 				END IF;
 ------------------- NEXTinstGet -----------------------	
 			WHEN NEXTinstGet =>
-			
+				SIGHold <='1';
 				IF data_Ready_32b = '1' THEN
 					SIGinstruction <= dataOut_32b;
 				END IF;
@@ -216,7 +218,7 @@ begin
 
 	
 	
-	currentState <= INIT WHEN reset = '1' ELSE
+	currentState <= IDLE WHEN reset = '1' ELSE
 					    nextState WHEN rising_edge(Clock);
 					
 					
@@ -253,51 +255,51 @@ begin
 	---------------------------------------------
 	-----------------BOOT LOADER-----------------
 	---------------------------------------------
-	load : PROCESS (Ready_32b, RcptAddr, SIGinstructionInit, currentStateInit)
-	BEGIN
-		funct3boot   <= "010";
-		SIGcptAddr   <= RcptAddr;
-		SIGstoreboot <= '0';
-		inputDMboot  <= SIGinstructionInit;
-		csDMboot     <= '0';
-		nextStateInit    <= currentStateInit;
-		bootfinish <= '0';
-		
-
-		CASE currentStateInit IS
-
-			WHEN WAITING =>
-				IF unsigned(RcptAddr) < SizeSRAM THEN
-					IF Ready_32b = '1' THEN
-						nextStateInit <= cpy;
-					END IF;
-				ELSE
-					nextStateInit <= stop;
-				END IF;
-
-			WHEN cpy =>
-				SIGstoreboot <= '1';
-				csDMboot     <= '1';
-				nextStateInit    <= next_Addr;
-
-			WHEN next_Addr =>
-				csDMboot   <= '0';
-				
-				IF Ready_32b = '1' THEN
-					SIGcptAddr <= STD_LOGIC_VECTOR(unsigned(RcptAddr) + 4);
-					nextStateInit  <= WAITING;
-				END IF;
-
-			WHEN stop      =>
-				bootfinish <= '1';
-		END CASE;
-	END PROCESS;
-
-	currentStateInit <= WAITING WHEN reset = '1' ELSE
-							  nextStateInit WHEN rising_edge(Clock);
-							  
-	RcptAddr <= (OTHERS => '0') WHEN reset = '1' ELSE
-					SIGcptAddr WHEN rising_edge(clock);
+--	load : PROCESS (Ready_32b, RcptAddr, SIGinstructionInit, currentStateInit)
+--	BEGIN
+--		funct3boot   <= "010";
+--		SIGcptAddr   <= RcptAddr;
+--		SIGstoreboot <= '0';
+--		inputDMboot  <= SIGinstructionInit;
+--		csDMboot     <= '0';
+--		nextStateInit    <= currentStateInit;
+--		bootfinish <= '0';
+--		
+--
+--		CASE currentStateInit IS
+--
+--			WHEN WAITING =>
+--				IF unsigned(RcptAddr) < SizeSRAM THEN
+--					IF Ready_32b = '1' THEN
+--						nextStateInit <= cpy;
+--					END IF;
+--				ELSE
+--					nextStateInit <= stop;
+--				END IF;
+--
+--			WHEN cpy =>
+--				SIGstoreboot <= '1';
+--				csDMboot     <= '1';
+--				nextStateInit    <= next_Addr;
+--
+--			WHEN next_Addr =>
+--				csDMboot   <= '0';
+--				
+--				IF Ready_32b = '1' THEN
+--					SIGcptAddr <= STD_LOGIC_VECTOR(unsigned(RcptAddr) + 4);
+--					nextStateInit  <= WAITING;
+--				END IF;
+--
+--			WHEN stop      =>
+--				bootfinish <= '1';
+--		END CASE;
+--	END PROCESS;
+--
+--	currentStateInit <= WAITING WHEN reset = '1' ELSE
+--							  nextStateInit WHEN rising_edge(Clock);
+--							  
+--	RcptAddr <= (OTHERS => '0') WHEN reset = '1' ELSE
+--					SIGcptAddr WHEN rising_edge(clock);
 					
 -----------------------------------------------------------------
 		
