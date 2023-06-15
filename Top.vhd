@@ -129,13 +129,18 @@ ARCHITECTURE archi OF Top IS
 			--reset    	: IN STD_LOGIC; --SW0
 			PCregister            	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			Instruction           	: IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-			RFin			: IN STD_LOGIC_VECTOR(31 downto 0);
-			RFout1		: IN STD_LOGIC_VECTOR(31 downto 0);
-			RFout2		: IN STD_LOGIC_VECTOR(31 downto 0);
+			RFin							: IN STD_LOGIC_VECTOR(31 downto 0);
+			RFout1						: IN STD_LOGIC_VECTOR(31 downto 0);
+			RFout2						: IN STD_LOGIC_VECTOR(31 downto 0);
+			SIGclkDebug 				: IN STD_LOGIC;
+			SIGreset	 					: IN STD_LOGIC;
+			SIGhold						: IN STD_LOGIC;
 
 			--OUTPUTS
+			TOPdisplay1           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1');  --0x80000004
 			TOPdisplay2           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1'); --0x80000008
-			TOPdisplay1           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1')  --0x80000004
+			TOPleds 						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '1')  --0x8000000C
+
 		);
 	END COMPONENT;
 	
@@ -262,9 +267,10 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL PLLlock                                       : STD_LOGIC;
 
 	--SIGNAL debuger
-	SIGNAL debugDisplay1, debugDisplay2			           : STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL debugDisplay1, debugDisplay2, debugLeds       : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL procDisplay1, procDisplay2, procLed           : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL RegcsDMProc, MuxcsDMProc                      : STD_LOGIC;
+	SIGNAL enableDebugSynchro									  : STD_LOGIC;
 	
 	SIGNAL SIGPROCinstruction 			: STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL SIGPROCoutputDM 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -361,17 +367,20 @@ BEGIN
 	SIGMEMdq <= (others => '0') WHEN SIGMEMcs='0' else SIGPROCdq;
 	--
 
+	enableDebugSynchro <= enableDebug when rising_edge(SIGPLLclock);
+	
 	SIGclock    <= TOPclock WHEN SIGsimulOn = '1' ELSE
-								buttonClock WHEN enableDebug = '1' AND SIGbootfinish='1' ELSE
+								buttonClock WHEN enableDebugSynchro = '1' ELSE
 								SIGPLLclock;
-
-	TOPdisplay1 <= procDisplay1 WHEN enableDebug = '0' ELSE
+	
+	TOPdisplay1 <= procDisplay1 WHEN enableDebugSynchro = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= procDisplay2 WHEN enableDebug = '0' ELSE
+	TOPdisplay2 <= procDisplay2 WHEN enableDebugSynchro = '0' ELSE
 		            debugDisplay2;
 
-	TOPLeds <= procLed WHEN enableDebug = '0' ELSE procLed;
+	TOPLeds 		<= procLed WHEN enableDebugSynchro = '0' ELSE 
+						debugLeds;
 
 	
 	SIGSelectDataOut <= SIGmemCS & SIGdispCS & SIGuartCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2) when rising_edge(SIGclock);
@@ -392,7 +401,7 @@ BEGIN
 	debug : debUGER
 	PORT MAP(
 		--TOPclock =>
-		enable      => enableDebug,
+		enable      => enableDebugSynchro,
 		SW8			=> SW8, 
 		SW7			=> SW7, 
 		SW6			=> SW6, 
@@ -404,9 +413,14 @@ BEGIN
 		RFin			=> SIGPROCRFin,
 		RFout1		=> SIGPROCRFout1,
 	   RFout2		=> SIGPROCRFout2,
+		SIGclkDebug => SIGclock,
+		SIGreset	 	=> TOPreset,
+		SIGhold		=> SIGPROChold,
 		--OUTPUTS
 		TOPdisplay2 => debugDisplay2,
-		TOPdisplay1 => debugDisplay1
+		TOPdisplay1 => debugDisplay1,
+		TOPleds 		=> debugLeds
+		
 	);
 
 	instPROC : Processor
@@ -568,7 +582,7 @@ BEGIN
 		PROChold         => SIGPROChold,
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
-		PROCstore        => MuxPROCstore_b, --SIGPROCstore,
+		PROCstore        => MuxPROCstore_b,
 		PROCload         => SIGPROCload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,

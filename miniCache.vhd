@@ -155,7 +155,7 @@ begin
 	
 	FSM_SDRAMmemory : PROCESS (ready_32b, PROCLoad, PROCstore, currentState, data_Ready_32b, dataOut_32b, currentStateInit, Reginstruction, PROCaddrDM)
 	BEGIN
-		SIGHold <='0'; -- hold at 1 = blocked
+		SIGHold <='1'; -- hold at 1 = blocked
 		nextState <= currentState;
 		SIGinstruction <= Reginstruction;
 		SIGstore 		<= '0';  --- store at 0 = read / store at 1 = store
@@ -164,13 +164,13 @@ begin
 		CASE currentState IS
    ------------------- INIT -----------------------
 			WHEN INIT => --waiting for the end of the bootloader
-				SIGHold <='1';
+--				SIGHold <='1';
 				IF currentStateInit=Stop AND Ready_32b = '1' THEN
 					nextstate <= IDLE;
 				END IF;
   ------------------- IDLE -----------------------
 			WHEN IDLE =>
-				SIGHold <='1';
+--				SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold <='0'; 
 					SIGcsDMCache <= '1';
@@ -186,7 +186,7 @@ begin
 				END IF;		
 ------------------- LOADdataGet -----------------------
 			WHEN LOADdataGet =>
-				SIGHold <='1';
+--				SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold      <= '0'; -- TEST
 					SIGstore     <= '0';
@@ -196,7 +196,7 @@ begin
 					
 ------------------- STOREdataEnd -----------------------
 			WHEN STOREdataEnd =>
-				SIGHold <='1';
+--				SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGstore      <= '0';
 					SIGcsDMCache  <= '1';
@@ -204,7 +204,7 @@ begin
 				END IF;
 ------------------- NEXTinstGet -----------------------	
 			WHEN NEXTinstGet =>
-				SIGHold <='1';
+--				SIGHold <='1';
 				IF data_Ready_32b = '1' THEN
 					SIGinstruction <= dataOut_32b;
 				END IF;
@@ -252,9 +252,9 @@ begin
    ---------------------------------------------
 	
 	
-	---------------------------------------------
-	-----------------BOOT LOADER-----------------
-	---------------------------------------------
+--	---------------------------------------------
+--	-----------------BOOT LOADER-----------------
+--	---------------------------------------------
 --	load : PROCESS (Ready_32b, RcptAddr, SIGinstructionInit, currentStateInit)
 --	BEGIN
 --		funct3boot   <= "010";

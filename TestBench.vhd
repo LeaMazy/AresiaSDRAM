@@ -48,6 +48,7 @@ architecture VHDL of TestBench is
 	signal dataLength : std_logic_vector(2 downto 0);
 	signal inputData, outputData: std_logic_vector(31 downto 0);
 	signal sigtx : std_logic;
+	signal sigboot : std_logic;
 
 	-- SDRAM SIMULATION --
 	signal outputData_SDRAM, inputData_SDRAM: std_logic_vector(15 downto 0);
@@ -62,9 +63,6 @@ architecture VHDL of TestBench is
 
 	type mem is array(0 to 2047) of std_logic_vector(15 downto 0);
 	signal TabMemory : mem :=(others => (others => '0'));
-	
-	signal sigBoot : std_logic;
-
 	
 															 
 
@@ -103,7 +101,7 @@ architecture VHDL of TestBench is
 		SW5		 		 => '0',
 		SW4		 		 => '0',
 		SW3		 		 => '0',
-		switchBoot 		 => sigBoot,
+		switchBoot 		 => sigboot,
 		buttonClock		 => '0',
 		tx					 => sigtx
 		
@@ -194,22 +192,14 @@ architecture VHDL of TestBench is
 			wait;
 		end process;
 		
-	bootTestbench: process
+		iBoot : process
 		begin
-		--init  simulation
-   		sigBoot <= '0';
-   		wait for 500 ns;
-			sigBoot <= '1';
-			wait for 5100 ns;
-   		sigBoot <= '0';
---			wait for 12100 ns;
---			sigBoot <= '1';
---			wait for 10100 ns;
---   		sigBoot <= '0';
---			wait for 12100 ns;
---			sigBoot <= '1';
---			wait for 10100 ns;
---   		sigBoot <= '0';
+		-- init  simulation
+			sigboot <= '0';
+			wait for 200 ns;
+			sigboot <= '1';
+			wait for 1210 ns;
+			sigboot <= '0';
 			wait;
 		end process;
 END vhdl;
