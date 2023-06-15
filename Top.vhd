@@ -270,6 +270,7 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL debugDisplay1, debugDisplay2, debugLeds       : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL procDisplay1, procDisplay2, procLed           : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL RegcsDMProc, MuxcsDMProc                      : STD_LOGIC;
+	SIGNAL enableDebugSynchro									  : STD_LOGIC;
 	
 	SIGNAL SIGPROCinstruction 			: STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL SIGPROCoutputDM 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -366,17 +367,19 @@ BEGIN
 	SIGMEMdq <= (others => '0') WHEN SIGMEMcs='0' else SIGPROCdq;
 	--
 
+	enableDebugSynchro <= enableDebug when rising_edge(SIGPLLclock);
+	
 	SIGclock    <= TOPclock WHEN SIGsimulOn = '1' ELSE
-								buttonClock WHEN enableDebug = '1' AND SIGbootfinish='1' ELSE
+								buttonClock WHEN enableDebugSynchro = '1' ELSE
 								SIGPLLclock;
-
-	TOPdisplay1 <= procDisplay1 WHEN enableDebug = '0' ELSE
+	
+	TOPdisplay1 <= procDisplay1 WHEN enableDebugSynchro = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= procDisplay2 WHEN enableDebug = '0' ELSE
+	TOPdisplay2 <= procDisplay2 WHEN enableDebugSynchro = '0' ELSE
 		            debugDisplay2;
 
-	TOPLeds 		<= procLed WHEN enableDebug = '0' ELSE 
+	TOPLeds 		<= procLed WHEN enableDebugSynchro = '0' ELSE 
 						debugLeds;
 
 	
@@ -398,7 +401,7 @@ BEGIN
 	debug : debUGER
 	PORT MAP(
 		--TOPclock =>
-		enable      => enableDebug,
+		enable      => enableDebugSynchro,
 		SW8			=> SW8, 
 		SW7			=> SW7, 
 		SW6			=> SW6, 
@@ -579,7 +582,7 @@ BEGIN
 		PROChold         => SIGPROChold,
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
-		PROCstore        => SIGPROCstore,
+		PROCstore        => MuxPROCstore_b,
 		PROCload         => SIGPROCload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,
