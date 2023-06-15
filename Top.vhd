@@ -81,22 +81,47 @@ ARCHITECTURE archi OF Top IS
 		);
 	END COMPONENT;
 
-	COMPONENT Displays IS
-		PORT (
-			--INPUTS
-			DISPcs 	 	 : in std_logic;
-			DISPclock    : IN  STD_LOGIC;
-			DISPreset    : IN  STD_LOGIC;
-			DISPaddr     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-			DISPinput    : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-			DISPwrite    : IN  STD_LOGIC;
-
-			--OUTPUTS
-			DISPleds     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-			DISPdisplay1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-			DISPdisplay2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+--	COMPONENT Displays IS
+--		PORT (
+--			--INPUTS
+--			DISPcs 	 	 : in std_logic;
+--			DISPclock    : IN  STD_LOGIC;
+--			DISPreset    : IN  STD_LOGIC;
+--			DISPaddr     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+--			DISPinput    : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+--			DISPwrite    : IN  STD_LOGIC;
+--
+--			--OUTPUTS
+--			DISPleds     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+--			DISPdisplay1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+--			DISPdisplay2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+--		);
+--	END COMPONENT;
+	
+	COMPONENT GPIO is
+		port (
+			--INPUTS from TOP
+			GPIOclock : in std_logic;
+			GPIOreset : in std_logic;
+			GPIOsw9,GPIOsw8,GPIOsw7,GPIOsw6,GPIOsw5	 : IN    STD_LOGIC; -- inputs for debuger (SW9 - SW5)
+			GPIOsw4,GPIOsw3,GPIOsw2,GPIOsw1,GPIOsw0	 : IN    STD_LOGIC; -- inputs for debuger (SW4 - SW3), boot (SW2), hold (SW1) and reset (SW0)
+			GPIOkey1, GPIOkey0								 : IN    STD_LOGIC; -- debug clock button (KEY0) & 2nd button (KEY1)
+			--INPUTS from PROC
+			GPIOcs 	 : in std_logic;
+			GPIOaddr  : in std_logic_vector(31 downto 0);
+			GPIOinput : in std_logic_vector(31 downto 0);
+			GPIOwrite : in std_logic;
+			
+			-- OUTPUTS to TOP
+			GPIOleds 	 : out std_logic_vector(31 downto 0);
+			GPIOdisplay1 : out std_logic_vector(31 downto 0);
+			GPIOdisplay2 : out std_logic_vector(31 downto 0);
+			-- OUTPUT to PROC
+			GPIOoutput	 : out std_logic_vector(31 downto 0)
 		);
-	END COMPONENT;
+	end COMPONENT;
+
+	
 	COMPONENT clock1M IS
 		PORT (
 			areset : IN  STD_LOGIC := '0';
@@ -249,6 +274,20 @@ ARCHITECTURE archi OF Top IS
 			DataOut_32b       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
 		);
 	END COMPONENT;
+	
+	component GPIO is
+	port (
+		clk, CS										 : IN STD_LOGIC;
+		enableDebug									 : IN STD_LOGIC := '0'; -- debugger mode (SW9)
+		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN STD_LOGIC := '0'; -- inputs for debuger (SW8 - SW3)
+		switchBoot									 : IN STD_LOGIC := '0'; -- input for bootloader (SW2)
+		hold											 : IN STD_LOGIC := '0'; -- hold switch (SW1)
+		reset                                : IN STD_LOGIC := '0'; -- reset switch (SW0)
+		buttonClock                          : IN STD_LOGIC := '0'; -- debug clock button
+		-- OUTPUT
+		TOPgpio 										 : OUT 	STD_LOGIC_VECTOR(31 DOWNTO 0)
+	);
+	end component;
 
 
 	--------STATE MACHINES	
@@ -306,7 +345,7 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGinstMux 	 	 : std_logic_vector(31 downto 0);
 	--UART
 	SIGNAL SIGuartCS	 	 	 : std_logic;
-	SIGNAL SIGSelectDataOut  : std_logic_vector(4 downto 0);
+	SIGNAL SIGSelectDataOut  : std_logic_vector(5 downto 0);
 	SIGNAL SIGUARTOut			 : std_logic_vector(31 downto 0);
 	SIGNAL SIGMuxDataOut		 : std_logic_vector(31 downto 0);
 	--Displayer
@@ -323,6 +362,10 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGData_Ready_16b                             : STD_LOGIC;
 	SIGNAL SIGDataOut_16b                                : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL SIGbootfinish	 										  : STD_LOGIC;
+	
+	-- Outputs from GPIO
+	SIGNAL SIGgpio				: std_logic_vector(31 downto 0);
+	SIGNAL SIGgpioCS			: std_logic;
 
 	
 
@@ -350,11 +393,12 @@ BEGIN
 	SIGsimulOn			<= PKG_simulON;
 	-----------------------
 	
-	-- Chip Select for sram, displayer and uart
-	SIGmemCS <= '0' when (SIGPROCaddrDM(31)='1' and (SIGPROCload='1' or SIGPROCstore='1')) else
+	-- Chip Select for sram, displayer, uart and gpio
+	SIGmemCS  <= '0' when (SIGPROCaddrDM(31)='1' and (SIGPROCload='1' or SIGPROCstore='1')) else
 					 '1'; --when (SIGPROCload='0') or (SIGPROCstore='0');
-	SIGdispCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0') else '0';
-	SIGuartCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1') else '0';
+	SIGdispCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0' and SIGPROCaddrDM(29)='0') else '0';
+	SIGuartCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1' and SIGPROCaddrDM(29)='0') else '0';
+	SIGgpioCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1' and SIGPROCaddrDM(29)='1') else '0';
 
 	-- Multiplexor for instruction between Boot and Sram
 	SIGinstMux <= SIGinstBoot when SIGboot = '1' else
@@ -370,8 +414,8 @@ BEGIN
 	enableDebugSynchro <= enableDebug when rising_edge(SIGPLLclock);
 	
 	SIGclock    <= TOPclock WHEN SIGsimulOn = '1' ELSE
-								buttonClock WHEN enableDebugSynchro = '1' ELSE
-								SIGPLLclock;
+						buttonClock WHEN enableDebugSynchro = '1' ELSE
+						SIGPLLclock;
 	
 	TOPdisplay1 <= procDisplay1 WHEN enableDebugSynchro = '0' ELSE
 		            debugDisplay1;
@@ -383,11 +427,12 @@ BEGIN
 						debugLeds;
 
 	
-	SIGSelectDataOut <= SIGmemCS & SIGdispCS & SIGuartCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2) when rising_edge(SIGclock);
-	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOut(4 downto 2)="100") else
-							procDisplay1    when (SIGSelectDataOut="01001") else --0x80000004
-							procDisplay2    when (SIGSelectDataOut="01010") else --0x80000008
-							SIGUARTOut 		 when (SIGSelectDataOut(4 downto 2)="001") else 
+	SIGSelectDataOut <= SIGmemCS & SIGdispCS & SIGuartCS & SIGgpioCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2) when rising_edge(SIGclock);
+	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOut(5 downto 2)="1000") else
+							procDisplay1    when (SIGSelectDataOut="010001") else --0x80000004
+							procDisplay2    when (SIGSelectDataOut="010010") else --0x80000008
+							SIGUARTOut 		 when (SIGSelectDataOut(5 downto 2)="0010") else 
+							SIGgpio			 when (SIGSelectDataOut(5 downto 2)="0010") else
 							(others => '0');
 	
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);
@@ -469,6 +514,39 @@ BEGIN
 		DISPdisplay1 => procDisplay1,
 		DISPdisplay2 => procDisplay2
 	);
+	
+	
+	instGPIO : GPIO
+	port map(
+		--INPUTS from TOP
+		GPIOclock  	 => SIGclock,
+		GPIOreset    => TOPreset,
+		GPIOsw9		 => enableDebug,
+		GPIOsw8		 => sw8,
+		GPIOsw7		 => sw7,
+		GPIOsw6		 => sw6,
+		GPIOsw5		 => sw5,
+		GPIOsw4		 => sw4,
+		GPIOsw3		 => sw3, 
+		GPIOsw2		 => switchBoot,
+		GPIOsw1		 => ,
+		GPIOsw0		 => reset,
+		GPIOkey1		 => , 
+		GPIOkey0		 =>,
+		--INPUTS from PROC
+		GPIOcs		 =>,
+		GPIOaddr		 =>,
+		GPIOinput	 =>,
+		GPIOwrite	 =>,
+		
+		-- OUTPUTS to TOP
+		GPIOleds		 =>,
+		GPIOdisplay1 =>,
+		GPIOdisplay2 =>,
+		-- OUTPUT to PROC
+		GPIOoutput 	 => 
+	);
+end entity;
 
 	instPLL : clock1M
 	PORT MAP(
@@ -599,8 +677,7 @@ BEGIN
 		Data_Ready_32b   => SIGData_Ready_32b,
 		DataOut_32b      => SIGDataOut_32b
 	);
-	
-	
+		
 
 	SIGbootMux <= switchBoot when currentState=R1 else 
 					  SIGbootReg;
