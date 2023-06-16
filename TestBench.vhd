@@ -20,6 +20,7 @@ architecture VHDL of TestBench is
 		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN    STD_LOGIC; -- inputs for debuger
 		switchBoot									 : IN 	STD_LOGIC; -- input for bootloader
 		TOPclock                             : IN    STD_LOGIC; -- must go through pll
+		switchHold									 : IN 	STD_LOGIC; -- input for hold (pause)
 		buttonClock                          : IN    STD_LOGIC;
 		reset                                : IN    STD_LOGIC;
 		rx												 : IN 	STD_LOGIC;
@@ -101,6 +102,7 @@ architecture VHDL of TestBench is
 		SW5		 		 => '0',
 		SW4		 		 => '0',
 		SW3		 		 => '0',
+		switchHold		 => '0',
 		switchBoot 		 => sigboot,
 		buttonClock		 => '0',
 		tx					 => sigtx

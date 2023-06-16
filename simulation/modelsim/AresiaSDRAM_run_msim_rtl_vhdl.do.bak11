@@ -6,6 +6,7 @@ vlib rtl_work
 vmap work rtl_work
 
 vlog -vlog01compat -work work +incdir+C:/ECE/Aresia/TestProcGit/AresiaSDRAM/db {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/db/clock1m_altpll.v}
+vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/GPIO.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/SDRAM_package.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/simul_var_pkg.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/SegmentDecoder.vhd}
@@ -17,7 +18,6 @@ vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/RAM8_0.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/ProgramCounter.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/Processor.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/InstructionDecoder.vhd}
-vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/Displays.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/Counter.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/clock1M.vhd}
 vcom -93 -work work {C:/ECE/Aresia/TestProcGit/AresiaSDRAM/Alu.vhd}

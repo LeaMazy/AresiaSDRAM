@@ -20,7 +20,8 @@ entity GPIO is
 		GPIOcs 	 : in std_logic;
 		GPIOaddr  : in std_logic_vector(31 downto 0);
 		GPIOinput : in std_logic_vector(31 downto 0);
-		GPIOwrite : in std_logic;
+		GPIOstore : in std_logic;
+		GPIOload : in std_logic;
 		
 		-- OUTPUTS to TOP
 		GPIOleds 	 : out std_logic_vector(31 downto 0);
@@ -42,15 +43,15 @@ architecture archi of GPIO is
 begin
 	-- BEGIN
 	
-	combDisplay1 <= GPIOinput when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else regDisplay1; --0x80000004
+	combDisplay1 <= GPIOinput when (GPIOcs='1' and GPIOstore='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else regDisplay1; --0x80000004
 	regDisplay1  <= (others => '1') when GPIOreset='1' else
 						 combDisplay1 when rising_edge(GPIOclock);
 					
-	combDisplay2 <= GPIOinput when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else regDisplay2; --0x80000008
+	combDisplay2 <= GPIOinput when (GPIOcs='1' and GPIOstore='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else regDisplay2; --0x80000008
 	regDisplay2  <= (others => '1') when GPIOreset='1' else
 						 combDisplay2 when rising_edge(GPIOclock);
 
-	combLed 		 <= GPIOinput when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else regLed;		 --0x8000000C
+	combLed 		 <= GPIOinput when (GPIOcs='1' and GPIOstore='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else regLed;		--0x8000000C
 	regLed 		 <= (others => '0') when GPIOreset='1' else
 						 combLed when rising_edge(GPIOclock);
 						 
@@ -63,11 +64,12 @@ begin
 	GPIOdisplay2 <= regDisplay2;
 	GPIOleds 	 <= regLed;
 	
-	GPIOoutput 	 <= regDisplay1 when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1')
-						 regDisplay2 when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0')
-						 regLed when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1')
-						 regGpio when (GPIOcs='1' and GPIOwrite='0' and GPIOaddr(3)='1' and GPIOaddr(2)='1')
-						 (others => '0');
+	GPIOoutput 	 <= regGpio when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='1') else																			--0x80000010
+						 regDisplay1 when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='0' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else				--0x80000004
+						 regDisplay2 when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else				--0x80000008
+						 regLed when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else						--0x8000000C
+--						 regGpio when (GPIOcs='1' and GPIOstore='0' and GPIOaddr(4)='1') else
+						 (others => '1');
 		
 	-- END
 end archi;

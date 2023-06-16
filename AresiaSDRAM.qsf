@@ -189,7 +189,6 @@ set_location_assignment PIN_B12 -to SW5
 set_location_assignment PIN_A12 -to SW4
 set_location_assignment PIN_C12 -to SW3
 set_global_assignment -name EDA_TEST_BENCH_FILE TestBench.vhd -section_id TestBench
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name VHDL_FILE GPIO.vhd
 set_global_assignment -name VHDL_FILE TestBench.vhd
 set_global_assignment -name VHDL_FILE SDRAM_package.vhd
@@ -217,3 +216,4 @@ set_global_assignment -name VHDL_FILE Alignment.vhd
 set_global_assignment -name VHDL_FILE Bootloader.vhd
 set_global_assignment -name VHDL_FILE UART.vhd
 set_global_assignment -name VHDL_FILE UARTComm.vhd
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
