@@ -50,6 +50,7 @@ architecture VHDL of TestBench is
 	signal inputData, outputData: std_logic_vector(31 downto 0);
 	signal sigtx : std_logic;
 	signal sigboot : std_logic;
+	signal sigdebug : std_logic;
 
 	-- SDRAM SIMULATION --
 	signal outputData_SDRAM, inputData_SDRAM: std_logic_vector(15 downto 0);
@@ -95,7 +96,7 @@ architecture VHDL of TestBench is
 		TOPdisplay2     => SigTOPdisplay2,
 		rx					 => '0',
 		
-		enableDebug 	 => '0',
+		enableDebug 	 => sigdebug,
 		SW8		 		 => '0',
 		SW7		 		 => '0',
 		SW6		 		 => '0',
@@ -200,8 +201,19 @@ architecture VHDL of TestBench is
 			sigboot <= '0';
 			wait for 200 ns;
 			sigboot <= '1';
+--			wait for 1210 ns;
+--			sigboot <= '0';
+			wait;
+		end process;
+		
+		iDebug : process
+		begin
+		-- init  simulation
+			sigdebug <= '1';
+			wait for 200 ns;
+			sigdebug <= '0';
 			wait for 1210 ns;
-			sigboot <= '0';
+			sigdebug <= '1';
 			wait;
 		end process;
 END vhdl;

@@ -24,6 +24,7 @@ architecture archi of Bootloader is
 --	TYPE ROM IS ARRAY(0 TO 71) OF std_logic_vector(0 to 31);
 --	TYPE ROM IS ARRAY(0 TO 211) OF std_logic_vector(0 to 31);
 	TYPE ROM IS ARRAY(0 TO 215) OF std_logic_vector(0 to 31);
+--	TYPE ROM IS ARRAY(0 TO 214) OF std_logic_vector(0 to 31);
 
 
 	SIGNAL rom_block : ROM :=(
@@ -106,7 +107,7 @@ architecture archi of Bootloader is
 	begin
 		sigpc <= addrInstBoot(11 downto 0);
 		instBoot <= rom_block(sigad) when rising_edge(clk);
-		sigad <= 215 when ((unsigned(sigpc) > 216)) else to_integer(unsigned(sigpc));
+		sigad <= 215 when ((unsigned(sigpc) > 215)) else to_integer(unsigned(sigpc));
 	
 end archi;
 -- END FILE

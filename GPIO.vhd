@@ -38,8 +38,8 @@ architecture archi of GPIO is
 		signal combDisplay1, regDisplay1 : std_logic_vector(31 downto 0);
 		signal combDisplay2, regDisplay2 : std_logic_vector(31 downto 0);
 		signal combLed, regLed : std_logic_vector(31 downto 0);
-		SIGNAL combGpio, regGpio	: STD_LOGIC_VECTOR(31 DOWNTO 0);
-
+		signal combGpio, regGpio	: std_logic_vector(31 DOWNTO 0) := (others => '0');
+		signal GPIOloadP2 : std_logic;
 begin
 	-- BEGIN
 	
@@ -56,18 +56,20 @@ begin
 						 combLed when rising_edge(GPIOclock);
 						 
 	combGpio 	 <= x"00000" & GPIOkey1 & GPIOkey0 & GPIOsw9 & GPIOsw8 & GPIOsw7 & GPIOsw6 & 
-						 GPIOsw5 & GPIOsw4 & GPIOsw3 & GPIOsw2 & GPIOsw1 & GPIOsw0;
+						 GPIOsw5 & GPIOsw4 & GPIOsw3 & GPIOsw2 & GPIOsw1 & GPIOsw0 when (GPIOcs='1') else
+						 regGpio;
 	regGpio 		 <= combGpio when rising_edge(GPIOclock);
-					
+	
+	GPIOloadP2 	 <= GPIOload when rising_edge(GPIOclock);
 	
 	GPIOdisplay1 <= regDisplay1;
 	GPIOdisplay2 <= regDisplay2;
 	GPIOleds 	 <= regLed;
 	
-	GPIOoutput 	 <= regGpio when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='1') else																			--0x80000010
-						 regDisplay1 when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='0' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else				--0x80000004
-						 regDisplay2 when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else				--0x80000008
-						 regLed when (GPIOcs='1' and GPIOload='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else						--0x8000000C
+	GPIOoutput 	 <= regGpio when (GPIOloadP2='1' and GPIOaddr(4)='1') else																			--0x80000010
+						 regDisplay1 when (GPIOloadP2='1' and GPIOaddr(4)='0' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else				--0x80000004
+						 regDisplay2 when (GPIOloadP2='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else				--0x80000008
+						 regLed when (GPIOloadP2='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else						--0x8000000C
 --						 regGpio when (GPIOcs='1' and GPIOstore='0' and GPIOaddr(4)='1') else
 						 (others => '1');
 		

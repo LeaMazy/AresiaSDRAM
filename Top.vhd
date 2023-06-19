@@ -428,13 +428,11 @@ BEGIN
 
 	
 --	SIGSelectDataOut <= SIGmemCS & SIGuartCS & SIGgpioCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2) when rising_edge(SIGclock);
-	SIGSelectDataOut <= SIGmemCS & SIGuartCS & SIGgpioCS when rising_edge(SIGclock);
+	SIGSelectDataOut <= SIGmemCS & SIGgpioCS & SIGuartCS when rising_edge(SIGclock);
 
-	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOut="100") else
---							procDisplay1    when (SIGSelectDataOut="010001") else --0x80000004
---							procDisplay2    when (SIGSelectDataOut="010010") else --0x80000008
-							SIGUARTOut 		 when (SIGSelectDataOut="010") else 
-							SIGGPIOoutput	 when (SIGSelectDataOut="001") else
+	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOut="100") else --0x00000000 to 0x7FFFFFFF
+							SIGGPIOoutput	 when (SIGSelectDataOut="010") else --0x80000000 to 0xBFFFFFFF
+							SIGUARTOut 		 when (SIGSelectDataOut="001") else --0xC0000000 to 0xFFFFFFFF
 							(others => '0');
 	
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);
