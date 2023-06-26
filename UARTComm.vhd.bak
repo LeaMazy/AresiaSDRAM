@@ -52,9 +52,7 @@ BEGIN
 	SIGSEL_STATUS <= '1' when (cs='1' and addOutMP(2)='0' and uartload='1' and uartstore='0') else '0';
 	SIGSEL_RX <= '1' when (cs='1' and addOutMP(2)='1' and uartload='1' and uartstore='0') else '0';
 	SIGSEL_TX <= '1' when (cs='1' and addOutMP(2)='1' and uartload='0' and uartstore='1') else '0';
---	SIGUART_STATUS <= ("00000" & SIGRX_FULL & SIGRX_ERROR & SIGTX_BUSY);
-	SIGUART_STATUS <= ("11111" & SIGRX_FULL & SIGRX_ERROR & SIGTX_BUSY);
-
+	SIGUART_STATUS <= ("00000" & SIGRX_FULL & SIGRX_ERROR & SIGTX_BUSY);
 	SIGMUXOUT <= SIGUART_STATUS when (SIGSEL_STATUS='1') else 
 				   (SIGRX_DATA) when (SIGSEL_RX='1') else
 					(others => '0');

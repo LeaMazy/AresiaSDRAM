@@ -253,7 +253,7 @@ ARCHITECTURE archi OF Top IS
 			clock             : IN  STD_LOGIC;
 			reset             : IN  STD_LOGIC;
 			bootfinish			: out std_logic;
-
+			loadInst				: IN STD_LOGIC; 
 			------------------------ TO PROC -----------------------
 			PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			PROCoutputDM      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -319,6 +319,8 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGPROCprogcounter			: STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL SIGPROCPC						: STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL SIGPROCstore, SIGPROCload : STD_LOGIC;
+	SIGNAL SIGMEMload 					: STD_LOGIC;
+
 	SIGNAL SIGPROCfunct3 				: STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL SIGPROCaddrDM 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL SIGPROCinputDM 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -341,6 +343,8 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGbootReg1, SIGbootReg2 : std_logic;
 	SIGNAL SIGbootChg			 : std_logic;
 	SIGNAL SIGboot			 	 : std_logic; --state machine boot
+	SIGNAL SIGboot_n			 	 : std_logic; --state machine boot
+
 	SIGNAL SIGbootReg		 	 : std_logic := '0'; 
 	SIGNAL SIGbootMux		 	 : std_logic;  
 	SIGNAL SIGinstBoot	 	 : std_logic_vector(31 downto 0);
@@ -398,11 +402,16 @@ BEGIN
 	SIGmemCS  <= '0' when (SIGPROCaddrDM(31)='1' and (SIGPROCload='1' or SIGPROCstore='1')) else
 					 '1'; --when (SIGPROCload='0') or (SIGPROCstore='0');
 	SIGgpioCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0') else '0';
+--	SIGgpioCS <= '1' when (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0') else '0';
+
 	SIGuartCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1') else '0';
+--	SIGuartCS <= '1' when (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1') else '0';
 
 	-- Multiplexor for instruction between Boot and Sram
 	SIGinstMux <= SIGinstBoot when SIGboot = '1' else
 					  SIGPROCinstruction;
+	
+	SIGMEMload <= SIGPROCload and SIGmemCS;
 	
 	-- Sram specific signal
 	-- avoid writing in memory when the proc wants to write on its outputs
@@ -438,7 +447,7 @@ BEGIN
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);
 	SIGbootReg2 <= SIGbootReg1 when rising_edge(SIGclock);
 	SIGbootChg 	<= SIGbootReg1 xor SIGbootReg2;
-	
+	SIGboot_n	<= not SIGboot;
 	
 
 	-- INSTANCES
@@ -654,6 +663,7 @@ BEGIN
 		clock            => SIGclock,
 		reset            => TOPreset,
 		bootfinish		  => SIGbootfinish,
+		loadInst			  => SIGboot_n,
 		------------------------ TO PROC -----------------------
 		PROCinstruction  => SIGPROCinstruction,
 		PROCoutputDM     => SIGPROCoutputDM,
@@ -661,7 +671,8 @@ BEGIN
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
 		PROCstore        => MuxPROCstore_b,
-		PROCload         => SIGPROCload,
+--		PROCload         => SIGPROCload,
+		PROCload			  => SIGMEMload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,
 		PROCinputDM      => SIGPROCinputDM,

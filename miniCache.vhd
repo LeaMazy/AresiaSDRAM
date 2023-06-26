@@ -21,6 +21,7 @@ ENTITY miniCache IS
 		reset             : IN  STD_LOGIC;
 		
 		bootfinish			: out std_logic;
+		loadInst				: IN STD_LOGIC; 
 
 		------------------------ TO PROC -----------------------
 		PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -181,7 +182,11 @@ begin
 						SIGstore     <= '1';
 						nextState    <= STOREdataEnd;
 					ELSE
-						nextstate    <= NEXTinstGet;
+						IF loadInst = '1' THEN
+							nextstate    <= NEXTinstGet;
+						ELSE
+							nextState 	 <= IDLE;
+						END IF;
 					END IF;
 				END IF;		
 ------------------- LOADdataGet -----------------------
@@ -191,7 +196,11 @@ begin
 					SIGHold      <= '0'; -- TEST
 					SIGstore     <= '0';
 					SIGcsDMCache <= '1';
-					nextstate    <= NEXTinstGet;
+					IF loadInst = '1' THEN
+							nextstate    <= NEXTinstGet;
+						ELSE
+							nextState 	 <= IDLE;
+						END IF;
 				END IF;
 					
 ------------------- STOREdataEnd -----------------------
@@ -200,7 +209,11 @@ begin
 				IF ready_32b = '1' THEN
 					SIGstore      <= '0';
 					SIGcsDMCache  <= '1';
-					nextstate     <= NEXTinstGet;
+					IF loadInst = '1' THEN
+							nextstate    <= NEXTinstGet;
+						ELSE
+							nextState 	 <= IDLE;
+						END IF;
 				END IF;
 ------------------- NEXTinstGet -----------------------	
 			WHEN NEXTinstGet =>
