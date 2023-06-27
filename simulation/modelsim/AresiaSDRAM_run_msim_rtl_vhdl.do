@@ -17,7 +17,6 @@ vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/RAM8_0.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/ProgramCounter.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/Processor.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/InstructionDecoder.vhd}
-vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/Displays.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/Counter.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/clock1M.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/Alu.vhd}
@@ -25,6 +24,7 @@ vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/Alignment.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/Bootloader.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/UART.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/UARTComm.vhd}
+vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/GPIO.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/SDRAM_controller.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/SDRAM_32b.vhd}
 vcom -93 -work work {C:/Users/leama/Aresia/GIT_SDRAM/AresiaSDRAM/miniCache.vhd}

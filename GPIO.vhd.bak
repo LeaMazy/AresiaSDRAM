@@ -1,0 +1,38 @@
+--
+-- Projet de fin d'études : RISC-V
+-- ECE Paris / SECAPEM
+-- Displays VHDL
+
+-- LIBRARIES
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+-- ENTITY
+entity GPIO is
+	port (
+		--INPUTS
+		clk									 		 : IN    STD_LOGIC;
+		enableDebug									 : IN    STD_LOGIC;  --  debugger mode
+		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN    STD_LOGIC;  --  inputs for debuger
+		switchBoot									 : IN 	STD_LOGIC;  --  input for bootloader
+		buttonClock                          : IN    STD_LOGIC;  --  Debug clock Button
+		hold                                 : IN    STD_LOGIC;
+		reset                                : IN    STD_LOGIC;
+		--OUTPUTS
+		TOPGPIO										 : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);	
+end entity;
+
+-- ARCHITECTURE
+architecture archi of Displays is
+	
+		signal SIGgpio : std_logic_vector(31 downto 0);
+
+begin
+	-- BEGIN
+	SIGgpio <= x"00000" & '0'buttonClock & enableDebug & SW8 & SW7 & SW6 & SW5 & SW4 & SW3 & switchBoot & hold & reset
+	TOPGPIO <= SIGgpio when rising_edge(clk);
+	
+	-- END
+end archi;
+-- END FILE

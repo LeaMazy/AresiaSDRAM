@@ -154,7 +154,7 @@ BEGIN
 --		clk0_phase_shift => "0",
 --		compensate_clock => "CLK0",
 --		inclk0_input_frequency => 20000,
-		--
+--		--
 		intended_device_family => "MAX 10",
 		lpm_hint => "CBX_MODULE_PREFIX=clock1M",
 		lpm_type => "altpll",

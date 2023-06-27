@@ -38,6 +38,7 @@ ENTITY Top IS
 	);
 END ENTITY;
 
+
 -- ARCHITECTURE
 ARCHITECTURE archi OF Top IS
 
@@ -106,21 +107,7 @@ ARCHITECTURE archi OF Top IS
 		);
 	END COMPONENT;
 
---	COMPONENT RAM8x4 IS
---		PORT (
---			address_a : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
---			address_b : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
---			clock     : IN  STD_LOGIC := '1';
---			data_a    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
---			data_b    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
---			enable    : IN  STD_LOGIC := '1';
---			wren_a    : IN  STD_LOGIC := '0';
---			wren_b    : IN  STD_LOGIC := '0';
---			dq    	 : IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
---			q_a       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
---			q_b       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
---		);
---	END COMPONENT;
+
 	COMPONENT DEBUGER IS
 		PORT (
 			-- INPUTS
@@ -132,10 +119,14 @@ ARCHITECTURE archi OF Top IS
 			RFin			: IN STD_LOGIC_VECTOR(31 downto 0);
 			RFout1		: IN STD_LOGIC_VECTOR(31 downto 0);
 			RFout2		: IN STD_LOGIC_VECTOR(31 downto 0);
-
+			SIGclkDebug : IN STD_LOGIC;
+			SIGresetDebug : IN STD_LOGIC;
+			SIGholdDebug : IN STD_LOGIC;
 			--OUTPUTS
 			TOPdisplay2           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1'); --0x80000008
-			TOPdisplay1           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1')  --0x80000004
+			TOPdisplay1           	: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '1');  --0x80000004
+			TOPled 						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '1')  --0x8000000c
+		
 		);
 	END COMPONENT;
 	
@@ -221,7 +212,7 @@ ARCHITECTURE archi OF Top IS
 			clock             : IN  STD_LOGIC;
 			reset             : IN  STD_LOGIC;
 			bootfinish			: out std_logic;
-
+			loadinst				: IN	STD_LOGIC;
 			------------------------ TO PROC -----------------------
 			PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			PROCoutputDM      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -245,6 +236,37 @@ ARCHITECTURE archi OF Top IS
 		);
 	END COMPONENT;
 
+	
+	COMPONENT GPIO IS
+	PORT (
+		--INPUTS
+		--INPUTS
+		-- From TOP
+		GPIOclock 															: in std_logic;
+		GPIOreset 															: in std_logic;
+		GPIOSW8, GPIOSW7, GPIOSW6, GPIOSW5, GPIOSW4, GPIOSW3 	: in std_logic;  --  inputs for debuger
+		GPIOhold																: in std_logic;
+		
+		-- From PROC
+		GPIOcs 	 : in std_logic;
+		GPIOaddr  : in std_logic_vector(31 downto 0);
+		GPIOinput : in std_logic_vector(31 downto 0);
+		GPIOwrite : in std_logic;
+		GPIOload  : in std_logic;
+		
+		
+		enableDebug									 : IN    STD_LOGIC;  --  debugger mode
+		switchBoot									 : IN 	STD_LOGIC;  --  input for bootloader
+		buttonClock                          : IN    STD_LOGIC;  --  Debug clock Butto
+		
+		
+		--OUTPUTS
+		DISPleds 	 : out std_logic_vector(31 downto 0);
+		DISPdisplay1 : out std_logic_vector(31 downto 0);
+		DISPdisplay2 : out std_logic_vector(31 downto 0);
+		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0)
+	);	
+	END COMPONENT;
 
 	--------STATE MACHINES	
 	TYPE BootMemMachine IS (idle, R1, R2, R3);	--state machine to force reset when boot mode is activated/desactivated
@@ -263,6 +285,7 @@ ARCHITECTURE archi OF Top IS
 
 	--SIGNAL debuger
 	SIGNAL debugDisplay1, debugDisplay2			           : STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL debugLeds												  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL procDisplay1, procDisplay2, procLed           : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL RegcsDMProc, MuxcsDMProc                      : STD_LOGIC;
 	
@@ -278,6 +301,7 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGPROCRFin 					: STD_LOGIC_VECTOR(31 DOWNTO 0);			 
 	SIGNAL SIGPROCRFout1	 				: STD_LOGIC_VECTOR(31 DOWNTO 0);	 
 	SIGNAL SIGPROCRFout2	 				: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL SIGenabledebugsync			: STD_LOGIC;
 	
 	SIGNAL SIGfunct3 						: STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL SIGcsDM, SIGwriteSelect   : STD_LOGIC;
@@ -319,8 +343,7 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGbootfinish	 										  : STD_LOGIC;
 
 	
-
-
+	SIGNAL SIGgpio													  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	
 	
 BEGIN
@@ -361,38 +384,40 @@ BEGIN
 	SIGMEMdq <= (others => '0') WHEN SIGMEMcs='0' else SIGPROCdq;
 	--
 
+	SIGenabledebugsync <= enableDebug WHEN rising_edge(SIGPLLclock);
+	
 	SIGclock    <= TOPclock WHEN SIGsimulOn = '1' ELSE
-								buttonClock WHEN enableDebug = '1' AND SIGbootfinish='1' ELSE
+								buttonClock WHEN SIGenabledebugsync = '1' ELSE -- AND SIGbootfinish='1' ELSE
 								SIGPLLclock;
 
-	TOPdisplay1 <= procDisplay1 WHEN enableDebug = '0' ELSE
+	TOPdisplay1 <= procDisplay1 WHEN SIGenabledebugsync = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= procDisplay2 WHEN enableDebug = '0' ELSE
+	TOPdisplay2 <= procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
 		            debugDisplay2;
 
-	TOPLeds <= procLed WHEN enableDebug = '0' ELSE procLed;
+	TOPLeds <= procLed WHEN SIGenabledebugsync = '0' ELSE debugLeds;
 
 	
 	SIGSelectDataOut <= SIGmemCS & SIGdispCS & SIGuartCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2) when rising_edge(SIGclock);
 	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOut(4 downto 2)="100") else
-							procDisplay1    when (SIGSelectDataOut="01001") else --0x80000004
-							procDisplay2    when (SIGSelectDataOut="01010") else --0x80000008
+							--procDisplay1    when (SIGSelectDataOut="01001") else --0x80000004
+							--procDisplay2    when (SIGSelectDataOut="01010") else --0x80000008
+							SIGgpio    when (SIGSelectDataOut(4 downto 2)="010") else 
 							SIGUARTOut 		 when (SIGSelectDataOut(4 downto 2)="001") else 
 							(others => '0');
 	
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);
 	SIGbootReg2 <= SIGbootReg1 when rising_edge(SIGclock);
 	SIGbootChg 	<= SIGbootReg1 xor SIGbootReg2;
-	
-	
+								  
 
 	-- INSTANCES
 
 	debug : debUGER
 	PORT MAP(
 		--TOPclock =>
-		enable      => enableDebug,
+		enable      => SIGenabledebugsync,
 		SW8			=> SW8, 
 		SW7			=> SW7, 
 		SW6			=> SW6, 
@@ -404,9 +429,14 @@ BEGIN
 		RFin			=> SIGPROCRFin,
 		RFout1		=> SIGPROCRFout1,
 	   RFout2		=> SIGPROCRFout2,
+		SIGclkDebug => SIGclock,
+		SIGresetDebug => TOPreset,
+		SIGholdDebug => SIGPROChold,
 		--OUTPUTS
 		TOPdisplay2 => debugDisplay2,
-		TOPdisplay1 => debugDisplay1
+		TOPdisplay1 => debugDisplay1,
+		TOPled => debugLeds
+		
 	);
 
 	instPROC : Processor
@@ -441,20 +471,20 @@ BEGIN
 		CPTcounter => SIGcounter
 	);
 
-	instDISP : Displays
-	PORT MAP(
-		--INPUTS
-		DISPcs 		 => SIGdispCS,
-		DISPclock    => SIGclock,
-		DISPreset    => TOPreset,
-		DISPaddr     => SIGPROCaddrDM,
-		DISPinput    => SIGPROCinputDM,
-		DISPWrite    => SIGPROCstore,
-		--OUTPUTS
-		DISPleds     => procLed,
-		DISPdisplay1 => procDisplay1,
-		DISPdisplay2 => procDisplay2
-	);
+--	instDISP : Displays
+--	PORT MAP(
+--		--INPUTS
+--		DISPcs 		 => SIGdispCS,
+--		DISPclock    => SIGclock,
+--		DISPreset    => TOPreset,
+--		DISPaddr     => SIGPROCaddrDM,
+--		DISPinput    => SIGPROCinputDM,
+--		DISPWrite    => SIGPROCstore,
+--		--OUTPUTS
+--		DISPleds     => procLed, --procLed,
+--		DISPdisplay1 => procDisplay1,	--procDisplay1,
+--		DISPdisplay2 => procDisplay2 --procDisplay1,
+--	);
 
 	instPLL : clock1M
 	PORT MAP(
@@ -562,13 +592,14 @@ BEGIN
 		clock            => SIGclock,
 		reset            => TOPreset,
 		bootfinish		  => SIGbootfinish,
+		loadinst			  => SIGboot,
 		------------------------ TO PROC -----------------------
 		PROCinstruction  => SIGPROCinstruction,
 		PROCoutputDM     => SIGPROCoutputDM,
 		PROChold         => SIGPROChold,
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
-		PROCstore        => SIGPROCstore,
+		PROCstore        => MuxPROCstore_b,
 		PROCload         => SIGPROCload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,
@@ -587,7 +618,38 @@ BEGIN
 	);
 	
 	
-
+	
+	instGPIO : GPIO
+	PORT MAP(
+	
+		GPIOclock 	=> SIGclock,
+		GPIOreset  => TOPreset,
+		GPIOSW8 		=> SW8,
+		GPIOSW7  	=> SW7,
+		GPIOSW6 		=> SW6,
+		GPIOSW5  	=> SW5,
+		GPIOSW4  	=> SW4,
+		GPIOSW3  	=> SW3,
+		GPIOhold 	=> '0',
+		
+		GPIOcs		=> SIGdispCS,
+		GPIOaddr		=> SIGPROCaddrDM,
+		GPIOinput	=> SIGPROCinputDM,
+		GPIOwrite	=> SIGPROCstore,
+		GPIOLoad		=> SIGPROCload,
+		
+		enableDebug	=> enableDebug,
+		switchBoot	=> switchBoot,
+		buttonClock => buttonClock,
+		
+		DISPleds 	 => procLed,
+		DISPdisplay1 => procdisplay1,
+		DISPdisplay2 => procdisplay2,
+		GPIOoutput	 => SIGgpio
+	);
+	
+	
+	
 	SIGbootMux <= switchBoot when currentState=R1 else 
 					  SIGbootReg;
 	SIGbootReg <= SIGbootMux when rising_edge(SIGclock);

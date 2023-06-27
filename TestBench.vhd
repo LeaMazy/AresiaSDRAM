@@ -60,6 +60,8 @@ architecture VHDL of TestBench is
 	signal reg00, reg01, reg02, reg03, reg04, reg05, reg06, reg07, reg08, reg09, reg0A, reg0B, reg0C, reg0D, reg0E, reg0F, reg10, reg11, reg12, reg13, reg14, reg15, reg16, reg17, reg18, reg19, reg1A, reg1B, reg1C, reg1D, reg1E, reg1F : std_logic_vector(31 downto 0);
 	signal SigTOPdisplay1, SigTOPdisplay2 : std_logic_vector (31 downto 0);
 
+	signal sigBoot  : std_logic;
+	
 	type mem is array(0 to 2047) of std_logic_vector(15 downto 0);
 	signal TabMemory : mem :=(others => (others => '0'));
 	
@@ -100,7 +102,7 @@ architecture VHDL of TestBench is
 		SW5		 		 => '0',
 		SW4		 		 => '0',
 		SW3		 		 => '0',
-		switchBoot 		 => '0',
+		switchBoot 		 => sigBoot,
 		buttonClock		 => '0',
 		tx					 => sigtx
 		
@@ -188,6 +190,25 @@ architecture VHDL of TestBench is
 			reset <= '1';
 			wait for 2 ns;
 			reset <= '0';
+			wait;
+		end process;
+		
+		bootTestbench: process
+		begin
+		--init  simulation
+   		sigBoot <= '0';
+   		wait for 600 ns;
+			sigBoot <= '1';
+			wait for 10100 ns;
+   		sigBoot <= '0';
+--			wait for 12100 ns;
+--			sigBoot <= '1';
+--			wait for 10100 ns;
+--   		sigBoot <= '0';
+--			wait for 12100 ns;
+--			sigBoot <= '1';
+--			wait for 10100 ns;
+--   		sigBoot <= '0';
 			wait;
 		end process;
 END vhdl;

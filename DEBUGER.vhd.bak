@@ -19,15 +19,12 @@ ENTITY debuger IS
  	   RFin			: IN STD_LOGIC_VECTOR(31 downto 0);
 		RFout1		: IN STD_LOGIC_VECTOR(31 downto 0);
 	   RFout2		: IN STD_LOGIC_VECTOR(31 downto 0);
-		SIGclkDebug : IN STD_LOGIC;
-		SIGresetDebug : IN STD_LOGIC;
-		SIGholdDebug : IN STD_LOGIC;
+
 		
 		--OUTPUTS
 		TOPdisplay2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '1'); --0x80000004
-		TOPdisplay1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '1');  --0x80000008
-		TOPled 		: OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '1')  --0x8000000c
-		
+		TOPdisplay1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '1')  --0x80000004
+
 	);
 END ENTITY;	
 
@@ -45,7 +42,6 @@ END COMPONENT;
 
 begin
 SW <= SW8 & SW7 & SW6 & SW5 & SW4 & SW3;
-TOPled <= x"FFFFF" & '0' & '0' & '0' & SIGclkDebug & '0' & '0' & '0' & '0' & '0' & '0' & SIGholdDebug & SIGresetDebug;
 
 display1 <= PCregister(15 downto 12) when enable='1' AND SW="100000" else
 				Instruction(31 downto 28) when enable='1' AND SW="000000" else
@@ -111,8 +107,8 @@ display6 <= x"f" when enable='1' AND SW="100000" else
 				RFout1(3 downto 0) when enable='1' AND SW="001011" else
 				RFout2(11 downto 8) when enable='1' AND SW="001100" else
 				RFout2(3 downto 0) when enable='1' AND SW="001101" else
-				x"f";		
-				
+				x"f";
+
 decoder1 : SegmentDecoder
 PORT MAP(
 	Sin7seg		=>	display1,

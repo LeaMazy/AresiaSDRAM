@@ -196,7 +196,8 @@ Mux_IN_Function3 <= IN_Function3 when IN_Select='1' else
 					Reg_IN_Function3;	
 
 Reg_IN_Data_32 <= (others => '0') when reset = '1' else
-						Mux_IN_Data_32 when rising_edge(Clock);	 
+						IN_Data_32 when rising_edge(Clock);
+						
 Mux_IN_Data_32 <= IN_Data_32 				  				           when IN_Select='1' AND DQM = "0000" else
 						x"0000" & IN_Data_32(15 downto 0)           when IN_Select='1' AND DQM = "1100" else
 						IN_Data_32(31 downto 16) & x"0000"          when IN_Select='1' AND DQM = "0011" else
