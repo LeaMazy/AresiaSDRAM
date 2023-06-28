@@ -154,7 +154,8 @@ ARCHITECTURE archi OF Top IS
 		uartload	:	IN STD_LOGIC;	
 		uartstore:	IN STD_LOGIC;	
 		data_out :  OUT 	STD_LOGIC_VECTOR(31 DOWNTO 0);
-		tx			:	OUT	STD_LOGIC
+		tx			:	OUT	STD_LOGIC;
+		debug		:  OUT	STD_LOGIC_VECTOR(31 DOWNTO 0)
 	);
 	END component;
 	
@@ -314,6 +315,7 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL MuxPROCstore_b  : STD_LOGIC;
 	SIGNAL SIGPROCdq		: STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL SIGMEMdq		: STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL SIGMEMload		: std_logic;
 	--BootLoader
 	SIGNAL SIGbootReg1, SIGbootReg2 : std_logic;
 	SIGNAL SIGbootChg			 : std_logic;
@@ -327,6 +329,7 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGSelectDataOut  : std_logic_vector(4 downto 0);
 	SIGNAL SIGUARTOut			 : std_logic_vector(31 downto 0);
 	SIGNAL SIGMuxDataOut		 : std_logic_vector(31 downto 0);
+	SIGNAL SIGdebugUART		 : std_logic_vector(31 downto 0);
 	--Displayer
 	SIGNAL SIGdispCS	 	 	 : std_logic;
 	
@@ -373,6 +376,8 @@ BEGIN
 	SIGdispCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0') else '0';
 	SIGuartCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1') else '0';
 
+	SIGMEMload <= SIGPROCload and SIGmemCS;
+	
 	-- Multiplexor for instruction between Boot and Sram
 	SIGinstMux <= SIGinstBoot when SIGboot = '1' else
 					  SIGPROCinstruction;
@@ -393,8 +398,9 @@ BEGIN
 	TOPdisplay1 <= procDisplay1 WHEN SIGenabledebugsync = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
-		            debugDisplay2;
+	TOPdisplay2 <= SIGdebugUART;
+--						procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
+--		            debugDisplay2;
 
 	TOPLeds <= procLed WHEN SIGenabledebugsync = '0' ELSE debugLeds;
 
@@ -405,8 +411,8 @@ BEGIN
 							--procDisplay2    when (SIGSelectDataOut="01010") else --0x80000008
 							SIGgpio    when (SIGSelectDataOut(4 downto 2)="010") else 
 							SIGUARTOut 		 when (SIGSelectDataOut(4 downto 2)="001") else 
-							(others => '0');
-	
+							(x"00000002");		-- (others => '0')
+					
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);
 	SIGbootReg2 <= SIGbootReg1 when rising_edge(SIGclock);
 	SIGbootChg 	<= SIGbootReg1 xor SIGbootReg2;
@@ -531,7 +537,8 @@ BEGIN
 		cs 		=> SIGuartCS,
 	   rx			=>	rx,
 		data_out => SIGUARTOut,
-		tx			=> tx
+		tx			=> tx,
+		debug		=> SIGdebugUART
 	);
 	
 	SDRAMconverter : SDRAM_32b
@@ -600,7 +607,7 @@ BEGIN
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
 		PROCstore        => MuxPROCstore_b,
-		PROCload         => SIGPROCload,
+		PROCload         => SIGMEMload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,
 		PROCinputDM      => SIGPROCinputDM,
