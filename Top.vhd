@@ -325,11 +325,12 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGinstBoot	 	 : std_logic_vector(31 downto 0);
 	SIGNAL SIGinstMux 	 	 : std_logic_vector(31 downto 0);
 	--UART
-	SIGNAL SIGuartCS	 	 	 : std_logic;
-	SIGNAL SIGSelectDataOut  : std_logic_vector(4 downto 0);
-	SIGNAL SIGUARTOut			 : std_logic_vector(31 downto 0);
-	SIGNAL SIGMuxDataOut		 : std_logic_vector(31 downto 0);
-	SIGNAL SIGdebugUART		 : std_logic_vector(31 downto 0);
+	SIGNAL SIGuartCS	 	 	 	: std_logic;
+	SIGNAL SIGSelectDataOut  	: std_logic_vector(4 downto 0);
+	SIGNAL SIGSelectDataOutReg :std_logic_vector(4 downto 0); 
+	SIGNAL SIGUARTOut			 	: std_logic_vector(31 downto 0);
+	SIGNAL SIGMuxDataOut		 	: std_logic_vector(31 downto 0);
+	SIGNAL SIGdebugUART		 	: std_logic_vector(31 downto 0);
 	--Displayer
 	SIGNAL SIGdispCS	 	 	 : std_logic;
 	
@@ -405,12 +406,15 @@ BEGIN
 	TOPLeds <= procLed WHEN SIGenabledebugsync = '0' ELSE debugLeds;
 
 	
-	SIGSelectDataOut <= SIGmemCS & SIGdispCS & SIGuartCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2) when rising_edge(SIGclock);
-	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOut(4 downto 2)="100") else
+	SIGSelectDataOut <= SIGSelectDataOutReg when SIGPROChold='1' else
+							  SIGmemCS & SIGdispCS & SIGuartCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2);
+							  
+	SIGSelectDataOutReg <= SIGSelectDataOut when rising_edge(SIGclock);
+	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOutReg(4 downto 2)="100") else
 							--procDisplay1    when (SIGSelectDataOut="01001") else --0x80000004
 							--procDisplay2    when (SIGSelectDataOut="01010") else --0x80000008
-							SIGgpio    when (SIGSelectDataOut(4 downto 2)="010") else 
-							SIGUARTOut 		 when (SIGSelectDataOut(4 downto 2)="001") else 
+							SIGgpio    when (SIGSelectDataOutReg(4 downto 2)="010") else 
+							SIGUARTOut 		 when (SIGSelectDataOutReg(4 downto 2)="001") else 
 							(x"00000002");		-- (others => '0')
 					
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);

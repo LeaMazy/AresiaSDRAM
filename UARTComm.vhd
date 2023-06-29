@@ -49,12 +49,14 @@ ARCHITECTURE vhdl OF uartComm IS
 	SIGNAL SIGMUXOUT		 : std_logic_vector(7 downto 0);
 	SIGNAL SIGREG_OUT	 	 : std_logic_vector(7 downto 0);
 	SIGNAL SIGdebug	 	 : std_logic_vector(7 downto 0);
+	SIGNAL SIGtestdebug   : std_logic;
+	SIGNAL SIGtestdeb     : std_logic :='0';
 	
 BEGIN
 	SIGRESET_N <= not reset;
 	SIGSEL_STATUS <= '1' when (cs='1' and addOutMP(2)='0' and uartload='1' and uartstore='0') else '0';
 	SIGSEL_RX <= '1' when (cs='1' and addOutMP(2)='1' and uartload='1' and uartstore='0') else '0';
-	SIGSEL_TX <= '1' when (cs='1' and addOutMP(2)='1' and uartstore='1') else '0';	--uartload='0'
+	SIGSEL_TX <= '1' when (cs='1' and addOutMP(2)='1' and uartload='0' and uartstore='1') else '0';	--uartload='0'
 	SIGUART_STATUS <= ("00000" & SIGRX_FULL & SIGRX_ERROR & SIGTX_BUSY);
 	SIGMUXOUT <= SIGUART_STATUS when (SIGSEL_STATUS='1') else 
 				   (SIGRX_DATA) when (SIGSEL_RX='1') else
@@ -63,7 +65,16 @@ BEGIN
 	SIGREG_OUT <= SIGMUXOUT when rising_edge(clk);
 	data_out <= "000000000000000000000000" & SIGREG_OUT;
 	-- debug <= "000000000000000000000000" & SIGRX_DATA;
-	debug <= "000000000000000000000000" & SIGdebug;
+	-- debug <= "000000000000000000000000" & SIGdebug;
+	
+	
+	SIGtestdebug <= '1' WHEN ((SIGSEL_TX and SIGTX_BUSY) = '1') else
+					    SIGtestdeb;
+	SIGtestdeb <= SIGtestdebug WHEN rising_edge(clk);
+	
+	
+	debug <= "0000000000000000000000000000000" & SIGtestdeb;
+	
 	
 	instUART : uart
 	PORT MAP(

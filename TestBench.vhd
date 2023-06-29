@@ -47,7 +47,7 @@ architecture VHDL of TestBench is
 	signal load, store : std_logic;
 	signal dataLength : std_logic_vector(2 downto 0);
 	signal inputData, outputData: std_logic_vector(31 downto 0);
-	signal sigtx : std_logic;
+	signal sigtx, sigrx : std_logic;
 
 	-- SDRAM SIMULATION --
 	signal outputData_SDRAM, inputData_SDRAM: std_logic_vector(15 downto 0);
@@ -93,7 +93,7 @@ architecture VHDL of TestBench is
 		reset        	 => reset,
 		TOPdisplay1     => SigTOPdisplay1,
 		TOPdisplay2     => SigTOPdisplay2,
-		rx					 => '0',
+		rx					 => sigrx,
 		
 		enableDebug 	 => '0',
 		SW8		 		 => '0',
@@ -199,16 +199,15 @@ architecture VHDL of TestBench is
    		sigBoot <= '0';
    		wait for 600 ns;
 			sigBoot <= '1';
-			wait for 10100 ns;
-   		sigBoot <= '0';
---			wait for 12100 ns;
---			sigBoot <= '1';
---			wait for 10100 ns;
---   		sigBoot <= '0';
---			wait for 12100 ns;
---			sigBoot <= '1';
---			wait for 10100 ns;
---   		sigBoot <= '0';
+			wait;
+		end process;
+		
+		irx: process
+		begin
+		--init  simulation
+   		sigrx <= '0';
+   		wait for 1000 ns;
+			sigrx <= '1';
 			wait;
 		end process;
 END vhdl;

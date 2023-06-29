@@ -6,9 +6,7 @@ add wave -noupdate /testbench/iTop/SIGboot
 add wave -noupdate -radix decimal /testbench/counter
 add wave -noupdate -radix hexadecimal /testbench/progcounter
 add wave -noupdate -radix hexadecimal /testbench/iTop/instPROC/instPC/SigPCnext
-add wave -noupdate -radix hexadecimal /testbench/iTop/instPROC/instPC/PChold
 add wave -noupdate -radix hexadecimal /testbench/iTop/minicacheInst/PROCinstruction
-add wave -noupdate -radix hexadecimal /testbench/instr
 add wave -noupdate -radix hexadecimal /testbench/dataAddr
 add wave -noupdate -radix hexadecimal -childformat {{/testbench/iTop/instPROC/instRF/RFin(31) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(30) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(29) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(28) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(27) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(26) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(25) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(24) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(23) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(22) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(21) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(20) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(19) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(18) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(17) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(16) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(15) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(14) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(13) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(12) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(11) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(10) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(9) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(8) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(7) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(6) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(5) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(4) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(3) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(2) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(1) -radix hexadecimal} {/testbench/iTop/instPROC/instRF/RFin(0) -radix hexadecimal}} -subitemconfig {/testbench/iTop/instPROC/instRF/RFin(31) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(30) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(29) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(28) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(27) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(26) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(25) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(24) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(23) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(22) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(21) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(20) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(19) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(18) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(17) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(16) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(15) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(14) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(13) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(12) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(11) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(10) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(9) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(8) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(7) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(6) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(5) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(4) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(3) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(2) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(1) {-height 15 -radix hexadecimal} /testbench/iTop/instPROC/instRF/RFin(0) {-height 15 -radix hexadecimal}} /testbench/iTop/instPROC/instRF/RFin
 add wave -noupdate -radix hexadecimal /testbench/load
@@ -30,33 +28,32 @@ add wave -noupdate -radix hexadecimal /testbench/iTop/minicacheInst/Data_Ready_3
 add wave -noupdate /testbench/iTop/minicacheInst/Ready_32b
 add wave -noupdate -radix hexadecimal /testbench/iTop/minicacheInst/Muxinstruction
 add wave -noupdate -radix hexadecimal /testbench/iTop/minicacheInst/Reginstruction
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/MuxPC
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigPC
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCclock
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCreset
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCoffset
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCoffsetsign
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCjal
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCjalr
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCbranch
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCfunct3
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCauipc
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCalueq
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCaluinf
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCalusup
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCaluinfU
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCalusupU
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PClock
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCLoad
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCnext
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PC
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigBranchCond
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux1Sel
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux2Sel
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux1Out
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux2Out
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigOffSum
-add wave -noupdate -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigOffSub
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/MuxPC
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigPC
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCclock
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCreset
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCoffset
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCoffsetsign
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCjal
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCjalr
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCbranch
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCfunct3
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCauipc
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCalueq
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCaluinf
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCalusup
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCaluinfU
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCalusupU
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCLoad
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PCnext
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/PC
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigBranchCond
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux1Sel
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux2Sel
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux1Out
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigMux2Out
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigOffSum
+add wave -noupdate -expand -group PC -radix hexadecimal /testbench/iTop/instPROC/instPC/SigOffSub
 add wave -noupdate -group DQ /testbench/iTop/instPROC/instALIGNMENT/IDimm12S
 add wave -noupdate -group DQ /testbench/iTop/instPROC/instALIGNMENT/IDimm12I
 add wave -noupdate -group Alignment -radix binary /testbench/iTop/instPROC/instALIGNMENT/IDimm12S
@@ -161,37 +158,62 @@ add wave -noupdate -group SDRAM -radix hexadecimal -childformat {{/testbench/Tab
 add wave -noupdate -group SDRAM -radix hexadecimal -childformat {{/testbench/AddrSDRAM6(24) -radix hexadecimal} {/testbench/AddrSDRAM6(23) -radix hexadecimal} {/testbench/AddrSDRAM6(22) -radix hexadecimal} {/testbench/AddrSDRAM6(21) -radix hexadecimal} {/testbench/AddrSDRAM6(20) -radix hexadecimal} {/testbench/AddrSDRAM6(19) -radix hexadecimal} {/testbench/AddrSDRAM6(18) -radix hexadecimal} {/testbench/AddrSDRAM6(17) -radix hexadecimal} {/testbench/AddrSDRAM6(16) -radix hexadecimal} {/testbench/AddrSDRAM6(15) -radix hexadecimal} {/testbench/AddrSDRAM6(14) -radix hexadecimal} {/testbench/AddrSDRAM6(13) -radix hexadecimal} {/testbench/AddrSDRAM6(12) -radix hexadecimal} {/testbench/AddrSDRAM6(11) -radix hexadecimal} {/testbench/AddrSDRAM6(10) -radix hexadecimal} {/testbench/AddrSDRAM6(9) -radix hexadecimal} {/testbench/AddrSDRAM6(8) -radix hexadecimal} {/testbench/AddrSDRAM6(7) -radix hexadecimal} {/testbench/AddrSDRAM6(6) -radix hexadecimal} {/testbench/AddrSDRAM6(5) -radix hexadecimal} {/testbench/AddrSDRAM6(4) -radix hexadecimal} {/testbench/AddrSDRAM6(3) -radix hexadecimal} {/testbench/AddrSDRAM6(2) -radix hexadecimal} {/testbench/AddrSDRAM6(1) -radix hexadecimal} {/testbench/AddrSDRAM6(0) -radix hexadecimal}} -subitemconfig {/testbench/AddrSDRAM6(24) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(23) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(22) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(21) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(20) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(19) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(18) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(17) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(16) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(15) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(14) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(13) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(12) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(11) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(10) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(9) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(8) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(7) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(6) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(5) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(4) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(3) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(2) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(1) {-height 15 -radix hexadecimal} /testbench/AddrSDRAM6(0) {-height 15 -radix hexadecimal}} /testbench/AddrSDRAM6
 add wave -noupdate -radix hexadecimal /simulpkg/PKG_outputData_SDRAM
 add wave -noupdate /simulpkg/PKG_simulON
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/switchBoot
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/regLed
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/regDisplay2
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/regDisplay1
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/enableDebug
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/combLed
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/combDisplay2
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/combDisplay1
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/buttonClock
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/TOPGPIO
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/SIGgpio
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOwrite
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOreset
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOoutput
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOload
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOinput
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOhold
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOcs
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOclock
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOaddr
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW8
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW7
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW6
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW5
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW4
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW3
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/DISPleds
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/DISPdisplay2
-add wave -noupdate -expand -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/DISPdisplay1
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/switchBoot
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/regLed
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/regDisplay2
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/regDisplay1
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/enableDebug
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/combLed
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/combDisplay2
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/combDisplay1
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/buttonClock
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/TOPGPIO
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/SIGgpio
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOwrite
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOreset
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOoutput
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOload
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOinput
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOhold
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOcs
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOclock
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOaddr
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW8
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW7
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW6
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW5
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW4
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/GPIOSW3
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/DISPleds
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/DISPdisplay2
+add wave -noupdate -group GPIO -radix hexadecimal /testbench/iTop/instGPIO/DISPdisplay1
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/SIGtestdeb
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/SIGSEL_TX
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/SIGTX_BUSY
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/SIGtestdebug
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/SIGtestdeb
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/debug
+add wave -noupdate /testbench/iTop/instUARTComm/instUART/tx_state
+add wave -noupdate /testbench/iTop/instUARTComm/instUART/tx_buffer
+add wave -noupdate /testbench/iTop/instUARTComm/instUART/baud_pulse
+add wave -noupdate /testbench/iTop/instUARTComm/instUART/clk
+add wave -noupdate /testbench/iTop/instPROC/PROCclock
+add wave -noupdate /testbench/iTop/instUARTComm/cs
+add wave -noupdate -radix hexadecimal /testbench/iTop/instUARTComm/addOutMP
+add wave -noupdate /testbench/iTop/instUARTComm/uartload
+add wave -noupdate /testbench/iTop/instUARTComm/uartstore
+add wave -noupdate -radix hexadecimal /testbench/iTop/instPROC/PROCoutputDM
+add wave -noupdate -radix hexadecimal /testbench/iTop/SIGMuxDataOut
+add wave -noupdate -radix hexadecimal /testbench/iTop/SIGUARTOut
+add wave -noupdate /testbench/iTop/SIGMEMcs
+add wave -noupdate /testbench/iTop/SIGdispCS
+add wave -noupdate /testbench/iTop/SIGuartCS
+add wave -noupdate -radix hexadecimal /testbench/iTop/SIGPROCaddrDM
+add wave -noupdate /testbench/iTop/SIGSelectDataOut
+add wave -noupdate -radix hexadecimal /testbench/instr
+add wave -noupdate /testbench/iTop/instPROC/Hold
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3988371 ps} 0}
+WaveRestoreCursors {{Cursor 1} {8799474 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 201
 configure wave -valuecolwidth 126
@@ -207,4 +229,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {6914704 ps}
+WaveRestoreZoom {8355712 ps} {9401971 ps}
