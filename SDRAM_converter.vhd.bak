@@ -11,7 +11,7 @@ use IEEE.NUMERIC_STD.ALL;
 use work.SDRAM_package.ALL;
 USE work.simulPkg.ALL;
 
-entity SDRAM_32b is 
+entity SDRAM_converter is 
     Port (
 	 
 		  -- global Inputs
@@ -43,7 +43,7 @@ entity SDRAM_32b is
 	);
 end SDRAM_32b;
 
-architecture vhdl of SDRAM_32b is 
+architecture vhdl of SDRAM_converter is 
 
 SIGNAL Mux_IN_Write_Select, Reg_IN_Write_Select 			    : STD_LOGIC;
 signal Reg_Data_Ready_32,	SIG_Ready_32b, SIG_data_Ready_32  : STD_LOGIC;
@@ -197,16 +197,15 @@ Mux_IN_Function3 <= IN_Function3 when IN_Select='1' else
 					Reg_IN_Function3;	
 
 Reg_IN_Data_32 <= (others => '0') when reset = '1' else
-						Mux_IN_Data_32 when rising_edge(Clock);
-						-- IN_Data_32 when rising_edge(Clock);
+						IN_Data_32 when rising_edge(Clock);
 						
-Mux_IN_Data_32 <= IN_Data_32 				  				           when IN_Select='1' else
---						x"0000" & IN_Data_32(15 downto 0)           when IN_Select='1' AND DQM = "1100" else
---						IN_Data_32(31 downto 16) & x"0000"          when IN_Select='1' AND DQM = "0011" else
---						x"000000" & IN_Data_32(7 downto 0)          when IN_Select='1' AND DQM = "1110" else
---						x"0000" & IN_Data_32(15 downto 8) & x"00"   when IN_Select='1' AND DQM = "1101" else
---						x"00" & IN_Data_32(23 downto 16) & x"0000"  when IN_Select='1' AND DQM = "1011" else
---				      IN_Data_32(31 downto 24) & x"000000" 		  when IN_Select='1' AND DQM = "0111" else
+Mux_IN_Data_32 <= IN_Data_32 				  				           when IN_Select='1' AND DQM = "0000" else
+						x"0000" & IN_Data_32(15 downto 0)           when IN_Select='1' AND DQM = "1100" else
+						IN_Data_32(31 downto 16) & x"0000"          when IN_Select='1' AND DQM = "0011" else
+						x"000000" & IN_Data_32(7 downto 0)          when IN_Select='1' AND DQM = "1110" else
+						x"0000" & IN_Data_32(15 downto 8) & x"00"   when IN_Select='1' AND DQM = "1101" else
+						x"00" & IN_Data_32(23 downto 16) & x"0000"  when IN_Select='1' AND DQM = "1011" else
+				      IN_Data_32(31 downto 24) & x"000000" 		  when IN_Select='1' AND DQM = "0111" else
 				      Reg_IN_Data_32;
 				  
 -------------------------DQM------------------------	
@@ -234,15 +233,14 @@ SIGDataOut_32b	<= (others=> '0') when reset='1' else
 -----MUX for char 
 -- behaviour : We want a byte or a half word of a 4-byte word (represented by a 0 --> DQM)
 -- the result of the mux will be a 4-byte word with the data placed on the LSB then filled with 0		
---Reg_DataOut <= Mux_data32 when Data_Ready_16b='1'else
---					Mux_data32 				 				       when  DQM="0000" else   
---					x"000000" & Mux_data32(7 downto 0)      when  DQM="1110" else
---					x"000000" & Mux_data32(15 downto 8)     when  DQM="1101" else
---					x"000000" & Mux_data32(23 downto 16)    when  DQM="1011" else
---					x"000000" & Mux_data32(31 downto 24)    when  DQM="0111" else
---					x"0000"   & Mux_data32(15 downto 0)     when  DQM="1100" else
---					x"0000"   & Mux_data32(31 downto 16)    when  DQM="0011" else
---					(others=>'1');
+Reg_DataOut <= Mux_data32 				 				       when  DQM="0000" else   
+					x"000000" & Mux_data32(7 downto 0)      when  DQM="1110" else
+					x"000000" & Mux_data32(15 downto 8)     when  DQM="1101" else
+					x"000000" & Mux_data32(23 downto 16)    when  DQM="1011" else
+					x"000000" & Mux_data32(31 downto 24)    when  DQM="0111" else
+					x"0000"   & Mux_data32(15 downto 0)     when  DQM="1100" else
+					x"0000"   & Mux_data32(31 downto 16)    when  DQM="0011" else
+					(others=>'0');
 
 -- assembly of the two parts of the data stored in the SDRAM				
 Mux_data32 <= S_DATA_part1 & S_DATA_part2 when Reg_Data_Ready_32='1'  else

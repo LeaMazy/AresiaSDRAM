@@ -4,7 +4,8 @@ USE ieee.numeric_std.all;
 
 ENTITY uart IS
 	GENERIC(
-		clk_freq		:	INTEGER		:= 40_000_000;		--frequency of system clock in Hertz
+--		clk_freq		:	INTEGER		:= 40_000_000;		--frequency of system clock in Hertz
+		clk_freq		:	INTEGER		:= 1_000_000;		--frequency of system clock in Hertz
 		baud_rate	:	INTEGER		:= 9_600;		--data link baud rate in bits/second
 		d_width		:	INTEGER		:= 8; 			--data bus width
 		parity		:	INTEGER		:= 0;			--0 for no parity, 1 for parity

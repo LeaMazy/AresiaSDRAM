@@ -399,9 +399,10 @@ BEGIN
 	TOPdisplay1 <= procDisplay1 WHEN SIGenabledebugsync = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= SIGdebugUART;
---						procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
---		            debugDisplay2;
+	TOPdisplay2 <= --x"0000" & SDRAM_DQ;
+						procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
+		            debugDisplay2;
+						-- SIGdebugUART;
 
 	TOPLeds <= procLed WHEN SIGenabledebugsync = '0' ELSE debugLeds;
 

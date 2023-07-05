@@ -109,30 +109,30 @@ begin
 ----FUNCTION3
 	funct3 <= Muxfunct3;
 	
-	Muxfunct3 <= funct3boot when currentStateInit /= STOP else
+	Muxfunct3 <= -- funct3boot when currentStateInit /= STOP else
 			       "010"	    when currentState = NEXTinstGet OR nextState = NEXTinstGet else
 			       PROCfunct3;
 ----writeSelect				
 	writeSelect <= MuxwriteSelect;
 
-	MuxwriteSelect <= SIGstoreboot when currentStateInit /= STOP else
+	MuxwriteSelect <= -- SIGstoreboot when currentStateInit /= STOP else
 				         SIGstore;
 ----CSDM
 
 	csDM <= MuxcsDM;
 	
-	MuxcsDM <= csDMboot when currentStateInit /= STOP else
+	MuxcsDM <= -- csDMboot when currentStateInit /= STOP else
 			     SIGcsDMCache;
 ----AddressDM		
 
 	AddressDM <= MuxAddressDM;
 						 
-	MuxAddressDM <= RcptAddr when currentStateInit /= STOP else
+	MuxAddressDM <= -- RcptAddr when currentStateInit /= STOP else
 			          PROCaddrDM when  nextState=STOREdataEnd OR nextState = LOADdataGet else
 			          PROCprogcounter;
 ---- INPUTDM
 	inputDM <= MuxinputDM;
-	MuxinputDM <= inputDMboot when currentStateInit /= STOP else
+	MuxinputDM <= -- inputDMboot when currentStateInit /= STOP else
 			        PROCinputDM;
 ------------------------------------------------
 
@@ -160,16 +160,19 @@ begin
 				-- SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold <='0'; 
-					SIGcsDMCache <= '1';
+					-- SIGcsDMCache <= '1';
 					
-					IF PROCLoad ='1' THEN
+					IF PROCLoad ='1' AND PROCaddrDM(31)='0' THEN
 						nextstate    <= LOADdataGet;
+						SIGcsDMCache <= '1';
 					ELSIF PROCstore ='1' AND PROCaddrDM(31)='0' THEN ---activate memory if the store is inside
 						SIGstore     <= '1';
 						nextState    <= STOREdataEnd;
+						SIGcsDMCache <= '1';
 					ELSE
 						IF loadinst='0' THEN
 							nextstate    <= NEXTinstGet;
+							SIGcsDMCache <= '1';
 						ELSE
 							nextstate	 <= IDLE;
 							END IF;
