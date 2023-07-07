@@ -39,7 +39,9 @@ entity SDRAM_32b is
 		  -- Input from SDRAM controller (16bits)
 		  Ready_16b				: in STD_LOGIC;
 		  Data_Ready_16b		: in STD_LOGIC;
-		  DataOut_16b			: in STD_LOGIC_VECTOR(15 downto 0)
+		  DataOut_16b			: in STD_LOGIC_VECTOR(15 downto 0);
+		  
+		  debug					:  OUT	STD_LOGIC_VECTOR(31 downto 0)
 	);
 end SDRAM_32b;
 
@@ -56,6 +58,11 @@ signal R_DATA, Reg_DataOut, SIGDataOut_32b						  : STD_LOGIC_VECTOR(31 downto 0
 signal Reg_IN_Data_32, Mux_IN_Data_32, Mux_data32	: STD_LOGIC_VECTOR(31 downto 0);
 signal Reg_IN_Function3, Mux_IN_Function3				: STD_LOGIC_VECTOR(1 downto 0);
 signal Reg_IN_Address, Mux_IN_Address					: STD_LOGIC_VECTOR(25 downto 0);
+
+
+SIGNAL SIGtestdebug   : std_logic;
+SIGNAL SIGtestdeb     : std_logic :='0';
+	
 
 Type state is (WAITING, READ_LSB_SEND, READ_LSB_GET, READ_MSB_GET, WRITE_LSB, END_WRITE);
 signal currentState, nextState : state;
@@ -261,5 +268,11 @@ SIG_data_Ready_32 <= '0' when reset = '1' else
 
 Ready_32b <= SIG_Ready_32b;
 
+
+SIGtestdebug <= '1' WHEN (SIGDataOut_32b = x"12345678") else
+					    SIGtestdeb;
+SIGtestdeb <= SIGtestdebug WHEN rising_edge(Clock);
+	
+debug <= "0000000000000000000000000000000" & SIGtestdeb;
 
 end vhdl;

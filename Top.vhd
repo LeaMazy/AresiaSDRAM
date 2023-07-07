@@ -183,7 +183,8 @@ ARCHITECTURE archi OF Top IS
 			-- Test Outputs (16bits)
 			Ready_16b        : IN  STD_LOGIC;
 			Data_Ready_16b   : IN  STD_LOGIC;
-			DataOut_16b      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0)
+			DataOut_16b      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			debug				  : OUT STD_LOGIC_VECTOR
 		);
 	END COMPONENT;
 
@@ -331,6 +332,8 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGUARTOut			 	: std_logic_vector(31 downto 0);
 	SIGNAL SIGMuxDataOut		 	: std_logic_vector(31 downto 0);
 	SIGNAL SIGdebugUART		 	: std_logic_vector(31 downto 0);
+	
+	SIGNAL SIGdebug32		 	: std_logic_vector(31 downto 0);
 	--Displayer
 	SIGNAL SIGdispCS	 	 	 : std_logic;
 	
@@ -399,10 +402,12 @@ BEGIN
 	TOPdisplay1 <= procDisplay1 WHEN SIGenabledebugsync = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= --x"0000" & SDRAM_DQ;
-						procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
-		            debugDisplay2;
-						-- SIGdebugUART;
+	TOPdisplay2 <= SIGdebug32;
+	
+--						--x"0000" & SDRAM_DQ;
+--						procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
+--		            debugDisplay2;
+--						-- SIGdebugUART;
 
 	TOPLeds <= procLed WHEN SIGenabledebugsync = '0' ELSE debugLeds;
 
@@ -571,7 +576,8 @@ BEGIN
 		-- Outputs (16bits)
 		Ready_16b        => SIGReady_16b,
 		Data_Ready_16b   => SIGData_Ready_16b,
-		DataOut_16b      => SIGDataOut_16b
+		DataOut_16b      => SIGDataOut_16b,
+		debug				  => SIGdebug32
 	);
 
 	SDRAMcontroller : SDRAM_controller
