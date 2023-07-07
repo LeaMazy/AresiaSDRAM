@@ -454,9 +454,9 @@ architecture archi of Bootloader is
 --		sigad <= 0 when (CS ='1' and sigpc=x"FFF") else 
 --					(to_integer(unsigned(sigpc))) when (CS ='1' and (unsigned(sigpc) < 98)) else 
 --					97;
-		sigad <= --0 when (CS ='1' and sigpc=x"FFF") else 
-					(to_integer(unsigned(sigpc))); --when (CS ='1' and (unsigned(sigpc) < 66)) else 
-					--65;
+		sigad <= 0 when (CS ='1' and sigpc=x"FFF") else 
+					(to_integer(unsigned(sigpc))) when (CS ='1' and (unsigned(sigpc) < 59)) else 
+					60;
 			
 end archi;
 -- END FILE

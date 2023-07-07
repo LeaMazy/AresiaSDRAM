@@ -164,7 +164,6 @@ ARCHITECTURE archi OF Top IS
 		PORT (
 			-- SDRAM Inputs
 			Clock, Reset     : IN  STD_LOGIC;
-			debug 			: out STD_LOGIC_VECTOR(31 downto 0);
 			-- Inputs (32bits)
 			IN_Address       : IN  STD_LOGIC_VECTOR(25 DOWNTO 0);
 			IN_Write_Select  : IN  STD_LOGIC;
@@ -588,8 +587,7 @@ BEGIN
 		-- Outputs (16bits)
 		Ready_16b        => SIGReady_16b,
 		Data_Ready_16b   => SIGData_Ready_16b,
-		DataOut_16b      => SIGDataOut_16b,
-		debug				  => SIGdebug32
+		DataOut_16b      => SIGDataOut_16b
 	);
 
 	SDRAMcontroller : SDRAM_controller
