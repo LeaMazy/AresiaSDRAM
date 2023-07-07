@@ -16,6 +16,7 @@ entity SDRAM_32b is
 	 
 		  -- global Inputs
         Clock, Reset : in STD_LOGIC;
+		  debug 			: out STD_LOGIC_VECTOR(31 downto 0);
 		
 		  -- Inputs from Minicache (32bits)
 		  IN_Address 		   : in STD_LOGIC_VECTOR(25 downto 0);
@@ -66,6 +67,8 @@ SIGNAL SIGtestdeb     : std_logic :='0';
 
 Type state is (WAITING, READ_LSB_SEND, READ_LSB_GET, READ_MSB_GET, WRITE_LSB, END_WRITE);
 signal currentState, nextState : state;
+
+signal SIGtestdebug, SIGtestdeb : std_logic :='0';
 
 begin
 
@@ -269,10 +272,13 @@ SIG_data_Ready_32 <= '0' when reset = '1' else
 Ready_32b <= SIG_Ready_32b;
 
 
-SIGtestdebug <= '1' WHEN (SIGDataOut_32b = x"12345678") else
+-------------------------------------------
+SIGtestdebug <= '1' WHEN (SIGDataOut_32b=x"78563412") else
 					    SIGtestdeb;
-SIGtestdeb <= SIGtestdebug WHEN rising_edge(Clock);
-	
+SIGtestdeb <= SIGtestdebug WHEN rising_edge(clock);
+
+
 debug <= "0000000000000000000000000000000" & SIGtestdeb;
+
 
 end vhdl;

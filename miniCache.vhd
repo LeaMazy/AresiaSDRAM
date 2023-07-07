@@ -19,7 +19,8 @@ ENTITY miniCache IS
 		-- INPUTS
 		clock             : IN  STD_LOGIC;
 		reset             : IN  STD_LOGIC;
-		
+	   debug 			: out STD_LOGIC_VECTOR(31 downto 0);
+
 		bootfinish			: out std_logic;
 		loadinst				: IN	STD_LOGIC;
 
@@ -99,6 +100,10 @@ CONSTANT SizeSRAM                                    : INTEGER := 4096;
 
 TYPE stateInit IS (WAITING, cpy, next_Addr, stop);
 SIGNAL currentStateInit, nextStateInit : stateInit;
+
+
+signal SIGtestdebug, SIGtestdeb : std_logic :='0';
+
 ---------------------------------------------------------------------------------
 
 begin
@@ -334,6 +339,13 @@ begin
 		q_a       => SIGinstructionInit -- DataOut Instruction
 --		q_b       => SIGoutputDM		-- DataOut Data
 	);
+
+SIGtestdebug <= '1' WHEN (Muxdata=x"78563412") else
+					    SIGtestdeb;
+SIGtestdeb <= SIGtestdebug WHEN rising_edge(clock);
+
+
+debug <= "0000000000000000000000000000000" & SIGtestdeb;
 END archi;
 
 -- END FILE

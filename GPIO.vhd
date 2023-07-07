@@ -35,7 +35,8 @@ entity GPIO is
 		DISPleds 	 : out std_logic_vector(31 downto 0);
 		DISPdisplay1 : out std_logic_vector(31 downto 0);
 		DISPdisplay2 : out std_logic_vector(31 downto 0);
-		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0)
+		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0);
+		debug			 : out std_logic_vector(31 DOWNTO 0)
 	);
 end entity;
 
@@ -47,6 +48,7 @@ architecture archi of GPIO is
 		signal combLed, regLed : std_logic_vector(31 downto 0);
 		signal SIGgpio, TOPGPIO : std_logic_vector(31 downto 0);
 		signal GPIOLoadP2 : std_logic;
+		signal SIGtestdebug, SIGtestdeb : std_logic :='0';
 begin
 	-- BEGIN
 	
@@ -76,6 +78,13 @@ begin
 						 regDisplay2 when (GPIOLoadP2='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else
 						 regLed when (GPIOLoadP2='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else
 						 (others => '0');
+						 
+	SIGtestdebug <= '1' WHEN (GPIOinput=x"0000000D") else
+					    SIGtestdeb;
+	SIGtestdeb <= SIGtestdebug WHEN rising_edge(GPIOclock);
+	
+	
+	debug <= "0000000000000000000000000000000" & SIGtestdeb;
 	-- END
 end archi;
 -- END FILE
