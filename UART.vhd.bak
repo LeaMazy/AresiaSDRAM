@@ -1,18 +1,14 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
-USE ieee.numeric_std.all;
 
 ENTITY uart IS
 	GENERIC(
---		clk_freq		:	INTEGER		:= 40_000_000;		--frequency of system clock in Hertz
-		clk_freq		:	INTEGER		:= 1_000_000;		--frequency of system clock in Hertz
-		baud_rate	:	INTEGER		:= 9_600;		--data link baud rate in bits/second
+		clk_freq		:	INTEGER		:= 40_000_000;		--frequency of system clock in Hertz
+		baud_rate	:	INTEGER		:= 115_200;		--data link baud rate in bits/second
 		d_width		:	INTEGER		:= 8; 			--data bus width
 		parity		:	INTEGER		:= 0;			--0 for no parity, 1 for parity
 		parity_eo	:	STD_LOGIC	:='0');		--'0' for even, '1' for odd parity
 	PORT(
-		debug	: 	OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		
 		clk		:	IN	STD_LOGIC;				--system clock
 		reset_n	:	IN	STD_LOGIC;				--ascynchronous reset
 		tx_ena	:	IN	STD_LOGIC;				--initiate transmission
@@ -37,7 +33,6 @@ ARCHITECTURE logic OF uart IS
 	SIGNAL	tx_parity		:	STD_LOGIC_VECTOR(d_width DOWNTO 0);  	--calculation of transmit parity
 	SIGNAL	rx_buffer		:	STD_LOGIC_VECTOR(parity+d_width DOWNTO 0) := (OTHERS => '0');  	--values received
 	SIGNAL	tx_buffer		:	STD_LOGIC_VECTOR(parity+d_width+1 DOWNTO 0) := (OTHERS => '1');	--values to be transmitted
-	SIGNAL  reg_debug			:   STD_LOGIC_VECTOR(7 DOWNTO 0);
 BEGIN
 
 	--generate clock enable pulses at the baud rate and the oversampling rate
@@ -126,7 +121,6 @@ BEGIN
 		VARIABLE tx_count		:	INTEGER RANGE 0 TO parity+d_width+3 := 0;  --count bits transmitted
 	BEGIN
 		IF(reset_n = '0') THEN								--asynchronous reset asserted
-			reg_debug <= (others => '0');
 			tx_count := 0;								--clear transmit bit counter
 			tx <= '1';								--set tx pin to idle value of high
 			tx_busy <= '1';								--set transmit busy signal to indicate unavailable
@@ -141,7 +135,6 @@ BEGIN
 						END IF;
 						tx_busy <= '1';								--assert transmit busy flag
 						tx_count := 0;								--clear transmit bit count
-						reg_debug <= std_logic_vector(unsigned(reg_debug) + 1);
 						tx_state <= transmit;							--proceed to transmit state
 					ELSE										--no new transaction initiated
 						tx_busy <= '0';								--clear transmit busy flag
@@ -161,8 +154,6 @@ BEGIN
 			tx <= tx_buffer(0);										--output last bit in transmit transaction buffer
 		END IF;
 	END PROCESS;	
-	
-	debug <= reg_debug;
 	
 	--transmit parity calculation logic
 	tx_parity(0) <= parity_eo;

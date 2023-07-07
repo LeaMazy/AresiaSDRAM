@@ -21,7 +21,7 @@ ENTITY miniCache IS
 		reset             : IN  STD_LOGIC;
 		
 		bootfinish			: out std_logic;
-		loadInst				: IN STD_LOGIC; 
+		loadinst				: IN	STD_LOGIC;
 
 		------------------------ TO PROC -----------------------
 		PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -43,26 +43,12 @@ ENTITY miniCache IS
 		Ready_32b         : IN  STD_LOGIC;
 		Data_Ready_32b    : IN  STD_LOGIC;
 		DataOut_32b       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
+		
 	);
 END ENTITY;
 
 architecture archi of miniCache is
 
-
---COMPONENT RAM_2PORT IS
---PORT (
---	address_a : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
---	address_b : IN  STD_LOGIC_VECTOR (11 DOWNTO 0);
---	clock     : IN  STD_LOGIC := '1';
---	data_a    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
---	data_b    : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
---	enable    : IN  STD_LOGIC := '1';
---	wren_a    : IN  STD_LOGIC := '0';
---	wren_b    : IN  STD_LOGIC := '0';
---	q_a       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
---	q_b       : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
---);
---END COMPONENT;
 
 COMPONENT RAM8x4 IS
 		PORT (
@@ -123,30 +109,30 @@ begin
 ----FUNCTION3
 	funct3 <= Muxfunct3;
 	
-	Muxfunct3 <= funct3boot when currentStateInit /= STOP else
+	Muxfunct3 <= -- funct3boot when currentStateInit /= STOP else
 			       "010"	    when currentState = NEXTinstGet OR nextState = NEXTinstGet else
 			       PROCfunct3;
 ----writeSelect				
 	writeSelect <= MuxwriteSelect;
 
-	MuxwriteSelect <= SIGstoreboot when currentStateInit /= STOP else
+	MuxwriteSelect <= -- SIGstoreboot when currentStateInit /= STOP else
 				         SIGstore;
 ----CSDM
 
 	csDM <= MuxcsDM;
 	
-	MuxcsDM <= csDMboot when currentStateInit /= STOP else
+	MuxcsDM <= -- csDMboot when currentStateInit /= STOP else
 			     SIGcsDMCache;
 ----AddressDM		
 
 	AddressDM <= MuxAddressDM;
 						 
-	MuxAddressDM <= RcptAddr when currentStateInit /= STOP else
+	MuxAddressDM <= -- RcptAddr when currentStateInit /= STOP else
 			          PROCaddrDM when  nextState=STOREdataEnd OR nextState = LOADdataGet else
 			          PROCprogcounter;
 ---- INPUTDM
 	inputDM <= MuxinputDM;
-	MuxinputDM <= inputDMboot when currentStateInit /= STOP else
+	MuxinputDM <= -- inputDMboot when currentStateInit /= STOP else
 			        PROCinputDM;
 ------------------------------------------------
 
@@ -154,7 +140,7 @@ begin
 	---------------- FSM SDRAM MEMORY-----------------
 	--------------------------------------------------
 	
-	FSM_SDRAMmemory : PROCESS (ready_32b, PROCLoad, PROCstore, currentState, data_Ready_32b, dataOut_32b, currentStateInit, Reginstruction, PROCaddrDM)
+	FSM_SDRAMmemory : PROCESS (ready_32b, PROCLoad, PROCstore, currentState, data_Ready_32b, dataOut_32b, currentStateInit, Reginstruction, PROCaddrDM, loadInst)
 	BEGIN
 		SIGHold <='1'; -- hold at 1 = blocked
 		nextState <= currentState;
@@ -165,59 +151,62 @@ begin
 		CASE currentState IS
    ------------------- INIT -----------------------
 			WHEN INIT => --waiting for the end of the bootloader
---				SIGHold <='1';
+				-- SIGHold <='1';
 				IF currentStateInit=Stop AND Ready_32b = '1' THEN
 					nextstate <= IDLE;
 				END IF;
   ------------------- IDLE -----------------------
 			WHEN IDLE =>
---				SIGHold <='1';
+				-- SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold <='0'; 
-					SIGcsDMCache <= '1';
+					-- SIGcsDMCache <= '1';
 					
-					IF PROCLoad ='1' THEN
+					IF PROCLoad ='1' AND PROCaddrDM(31)='0' THEN
 						nextstate    <= LOADdataGet;
+						SIGcsDMCache <= '1';
 					ELSIF PROCstore ='1' AND PROCaddrDM(31)='0' THEN ---activate memory if the store is inside
 						SIGstore     <= '1';
 						nextState    <= STOREdataEnd;
+						SIGcsDMCache <= '1';
 					ELSE
-						IF loadInst = '1' THEN
+						IF loadinst='0' THEN
 							nextstate    <= NEXTinstGet;
+							SIGcsDMCache <= '1';
 						ELSE
-							nextState 	 <= IDLE;
-						END IF;
+							nextstate	 <= IDLE;
+							END IF;
 					END IF;
 				END IF;		
 ------------------- LOADdataGet -----------------------
 			WHEN LOADdataGet =>
---				SIGHold <='1';
+				-- SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGHold      <= '0'; -- TEST
 					SIGstore     <= '0';
 					SIGcsDMCache <= '1';
-					IF loadInst = '1' THEN
+					IF loadinst='0' THEN
 							nextstate    <= NEXTinstGet;
-						ELSE
-							nextState 	 <= IDLE;
-						END IF;
+					ELSE
+							nextstate	 <= IDLE;
+					END IF;
 				END IF;
 					
 ------------------- STOREdataEnd -----------------------
 			WHEN STOREdataEnd =>
---				SIGHold <='1';
+				-- SIGHold <='1';
 				IF ready_32b = '1' THEN
 					SIGstore      <= '0';
 					SIGcsDMCache  <= '1';
-					IF loadInst = '1' THEN
+					IF loadinst='0' THEN
 							nextstate    <= NEXTinstGet;
-						ELSE
-							nextState 	 <= IDLE;
-						END IF;
+					ELSE
+							nextstate	 <= IDLE;
+					END IF;
 				END IF;
 ------------------- NEXTinstGet -----------------------	
 			WHEN NEXTinstGet =>
---				SIGHold <='1';
+				-- SIGHold <='1';
 				IF data_Ready_32b = '1' THEN
 					SIGinstruction <= dataOut_32b;
 				END IF;
@@ -265,9 +254,9 @@ begin
    ---------------------------------------------
 	
 	
---	---------------------------------------------
---	-----------------BOOT LOADER-----------------
---	---------------------------------------------
+	---------------------------------------------
+	-----------------BOOT LOADER-----------------
+	---------------------------------------------
 --	load : PROCESS (Ready_32b, RcptAddr, SIGinstructionInit, currentStateInit)
 --	BEGIN
 --		funct3boot   <= "010";
@@ -313,7 +302,7 @@ begin
 --							  
 --	RcptAddr <= (OTHERS => '0') WHEN reset = '1' ELSE
 --					SIGcptAddr WHEN rising_edge(clock);
-					
+----					
 -----------------------------------------------------------------
 		
 --Memory : RAM_2PORT

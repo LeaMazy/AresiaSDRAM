@@ -20,7 +20,6 @@ architecture VHDL of TestBench is
 		SW8, SW7, SW6, SW5, SW4, SW3 			 : IN    STD_LOGIC; -- inputs for debuger
 		switchBoot									 : IN 	STD_LOGIC; -- input for bootloader
 		TOPclock                             : IN    STD_LOGIC; -- must go through pll
-		switchHold									 : IN 	STD_LOGIC; -- input for hold (pause)
 		buttonClock                          : IN    STD_LOGIC;
 		reset                                : IN    STD_LOGIC;
 		rx												 : IN 	STD_LOGIC;
@@ -48,9 +47,7 @@ architecture VHDL of TestBench is
 	signal load, store : std_logic;
 	signal dataLength : std_logic_vector(2 downto 0);
 	signal inputData, outputData: std_logic_vector(31 downto 0);
-	signal sigtx : std_logic;
-	signal sigboot : std_logic;
-	signal sigdebug : std_logic;
+	signal sigtx, sigrx : std_logic;
 
 	-- SDRAM SIMULATION --
 	signal outputData_SDRAM, inputData_SDRAM: std_logic_vector(15 downto 0);
@@ -63,6 +60,8 @@ architecture VHDL of TestBench is
 	signal reg00, reg01, reg02, reg03, reg04, reg05, reg06, reg07, reg08, reg09, reg0A, reg0B, reg0C, reg0D, reg0E, reg0F, reg10, reg11, reg12, reg13, reg14, reg15, reg16, reg17, reg18, reg19, reg1A, reg1B, reg1C, reg1D, reg1E, reg1F : std_logic_vector(31 downto 0);
 	signal SigTOPdisplay1, SigTOPdisplay2 : std_logic_vector (31 downto 0);
 
+	signal sigBoot,sigDebug  : std_logic;
+	
 	type mem is array(0 to 2047) of std_logic_vector(15 downto 0);
 	signal TabMemory : mem :=(others => (others => '0'));
 	
@@ -94,17 +93,16 @@ architecture VHDL of TestBench is
 		reset        	 => reset,
 		TOPdisplay1     => SigTOPdisplay1,
 		TOPdisplay2     => SigTOPdisplay2,
-		rx					 => '0',
+		rx					 => sigrx,
 		
-		enableDebug 	 => sigdebug,
+		enableDebug 	 => sigDebug,
 		SW8		 		 => '0',
 		SW7		 		 => '0',
 		SW6		 		 => '0',
 		SW5		 		 => '0',
 		SW4		 		 => '0',
 		SW3		 		 => '0',
-		switchHold		 => '0',
-		switchBoot 		 => sigboot,
+		switchBoot 		 => sigBoot,
 		buttonClock		 => '0',
 		tx					 => sigtx
 		
@@ -195,25 +193,33 @@ architecture VHDL of TestBench is
 			wait;
 		end process;
 		
-		iBoot : process
+		bootTestbench: process
 		begin
-		-- init  simulation
-			sigboot <= '0';
-			wait for 200 ns;
-			sigboot <= '1';
---			wait for 1210 ns;
---			sigboot <= '0';
+		--init  simulation
+   		sigBoot <= '0';
+   		wait for 600 ns;
+			sigBoot <= '1';
 			wait;
 		end process;
 		
-		iDebug : process
+		irx: process
 		begin
-		-- init  simulation
-			sigdebug <= '1';
-			wait for 200 ns;
-			sigdebug <= '0';
-			wait for 1210 ns;
-			sigdebug <= '1';
+		--init  simulation
+   		sigrx <= '0';
+   		wait for 1000 ns;
+			sigrx <= '1';
 			wait;
 		end process;
+		
+		idebug: process
+		begin
+		--init  simulation
+   		sigDebug <= '0';
+   		wait for 10000 ns;
+			sigDebug <= '1';
+			wait for 5000 ns;
+			sigDebug <= '0';
+			wait;
+		end process;
+		
 END vhdl;

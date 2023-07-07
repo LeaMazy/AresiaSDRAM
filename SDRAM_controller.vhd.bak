@@ -41,7 +41,7 @@ Type state is (S_First, S_Start, S_PRECHARGE_INIT, S_Refresh_INIT, S_NOP_INIT, S
 		
 signal currentState, nextState : state;
 
-signal Reg_D, Reg_D1, muxRegD : STD_LOGIC_VECTOR ((DATA_WIDTH-1) downto 0);
+signal Reg_D, muxRegD : STD_LOGIC_VECTOR ((DATA_WIDTH-1) downto 0);
 signal Reg_A, muxRegA : STD_LOGIC_VECTOR (24 downto 0);
 signal Reg_DQM, muxRegDQM : STD_LOGIC_VECTOR ((DQM_WIDTH-1) downto 0);
 
@@ -117,7 +117,7 @@ Reg_A <= (others=>'0') when reset='1' else
 		 
 muxRegD <= Data_IN when reg_ready = '1' else 
 			  Reg_D;
-	
+			  
 Reg_D <= (others=>'0') when reset='1' else 
 			muxRegD when rising_edge(clk);
 

@@ -1,6 +1,7 @@
--- Projet : RISC-V
--- ECE Paris / ARESIA
--- GPIO VHDL
+--
+-- Projet de fin d'études : RISC-V
+-- ECE Paris / SECAPEM
+-- Displays VHDL
 
 -- LIBRARIES
 library ieee;
@@ -10,25 +11,31 @@ use ieee.numeric_std.all;
 -- ENTITY
 entity GPIO is
 	port (
-		--INPUTS from TOP
-		GPIOclock : in std_logic;
-		GPIOreset : in std_logic;
-		GPIOsw9,GPIOsw8,GPIOsw7,GPIOsw6,GPIOsw5	 : IN    STD_LOGIC; -- inputs for debuger (SW9 - SW5)
-		GPIOsw4,GPIOsw3,GPIOsw2,GPIOsw1,GPIOsw0	 : IN    STD_LOGIC; -- inputs for debuger (SW4 - SW3), boot (SW2), hold (SW1) and reset (SW0)
-		GPIOkey1, GPIOkey0								 : IN    STD_LOGIC; -- debug clock button (KEY0) & 2nd button (KEY1)
-		--INPUTS from PROC
+		--INPUTS
+		-- From TOP
+		GPIOclock 															: in std_logic;
+		GPIOreset 															: in std_logic;
+		GPIOSW8, GPIOSW7, GPIOSW6, GPIOSW5, GPIOSW4, GPIOSW3 	: in std_logic;  --  inputs for debuger
+		GPIOhold																: in std_logic;
+		
+		-- From PROC
 		GPIOcs 	 : in std_logic;
 		GPIOaddr  : in std_logic_vector(31 downto 0);
 		GPIOinput : in std_logic_vector(31 downto 0);
-		GPIOstore : in std_logic;
-		GPIOload : in std_logic;
+		GPIOwrite : in std_logic;
+		GPIOload  : in std_logic;
 		
-		-- OUTPUTS to TOP
-		GPIOleds 	 : out std_logic_vector(31 downto 0);
-		GPIOdisplay1 : out std_logic_vector(31 downto 0);
-		GPIOdisplay2 : out std_logic_vector(31 downto 0);
-		-- OUTPUT to PROC
-		GPIOoutput	 : out std_logic_vector(31 downto 0)
+		
+		enableDebug									 : IN    STD_LOGIC;  --  debugger mode
+		switchBoot									 : IN 	STD_LOGIC;  --  input for bootloader
+		buttonClock                          : IN    STD_LOGIC;  --  Debug clock Butto
+		
+		
+		--OUTPUTS
+		DISPleds 	 : out std_logic_vector(31 downto 0);
+		DISPdisplay1 : out std_logic_vector(31 downto 0);
+		DISPdisplay2 : out std_logic_vector(31 downto 0);
+		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0)
 	);
 end entity;
 
@@ -38,41 +45,37 @@ architecture archi of GPIO is
 		signal combDisplay1, regDisplay1 : std_logic_vector(31 downto 0);
 		signal combDisplay2, regDisplay2 : std_logic_vector(31 downto 0);
 		signal combLed, regLed : std_logic_vector(31 downto 0);
-		signal combGpio, regGpio	: std_logic_vector(31 DOWNTO 0) := (others => '0');
-		signal GPIOloadP2 : std_logic;
+		signal SIGgpio, TOPGPIO : std_logic_vector(31 downto 0);
+		signal GPIOLoadP2 : std_logic;
 begin
 	-- BEGIN
 	
-	combDisplay1 <= GPIOinput when (GPIOcs='1' and GPIOstore='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else regDisplay1; --0x80000004
+	combDisplay1 <= GPIOinput when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else regDisplay1; --0x80000004
 	regDisplay1  <= (others => '1') when GPIOreset='1' else
 						 combDisplay1 when rising_edge(GPIOclock);
 					
-	combDisplay2 <= GPIOinput when (GPIOcs='1' and GPIOstore='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else regDisplay2; --0x80000008
+	combDisplay2 <= GPIOinput when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else regDisplay2; --0x80000008
 	regDisplay2  <= (others => '1') when GPIOreset='1' else
 						 combDisplay2 when rising_edge(GPIOclock);
 
-	combLed 		 <= GPIOinput when (GPIOcs='1' and GPIOstore='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else regLed;		--0x8000000C
+	combLed 		 <= GPIOinput when (GPIOcs='1' and GPIOwrite='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else regLed;		 --0x8000000C
 	regLed 		 <= (others => '0') when GPIOreset='1' else
 						 combLed when rising_edge(GPIOclock);
-						 
-	combGpio 	 <= x"00000" & GPIOkey1 & GPIOkey0 & GPIOsw9 & GPIOsw8 & GPIOsw7 & GPIOsw6 & 
-						 GPIOsw5 & GPIOsw4 & GPIOsw3 & GPIOsw2 & GPIOsw1 & GPIOsw0 when (GPIOcs='1') else
-						 regGpio;
-	regGpio 		 <= combGpio when rising_edge(GPIOclock);
+					
+	SIGgpio <= x"00000" & '0' & buttonClock & enableDebug & GPIOSW8 & GPIOSW7 & GPIOSW6 & GPIOSW5 & GPIOSW4 & GPIOSW3 & switchBoot & GPIOhold & GPIOreset;
+	TOPGPIO <= SIGgpio when rising_edge(GPIOclock);
 	
-	GPIOloadP2 	 <= GPIOload when rising_edge(GPIOclock);
+	DISPdisplay1 <= regDisplay1;
+	DISPdisplay2 <= regDisplay2;
+	DISPleds 	 <= regLed;
 	
-	GPIOdisplay1 <= regDisplay1;
-	GPIOdisplay2 <= regDisplay2;
-	GPIOleds 	 <= regLed;
+	GPIOLoadP2	<= GPIOLoad when rising_edge(GPIOclock);
 	
-	GPIOoutput 	 <= regGpio when (GPIOloadP2='1' and GPIOaddr(4)='1') else																			--0x80000010
-						 regDisplay1 when (GPIOloadP2='1' and GPIOaddr(4)='0' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else				--0x80000004
-						 regDisplay2 when (GPIOloadP2='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else				--0x80000008
-						 regLed when (GPIOloadP2='1' and GPIOaddr(4)='0' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else						--0x8000000C
---						 regGpio when (GPIOcs='1' and GPIOstore='0' and GPIOaddr(4)='1') else
-						 (others => '1');
-		
+	GPIOoutput	 <= TOPGPIO when (GPIOLoadP2='1' and GPIOaddr(4)='1') else
+						 regDisplay1 when (GPIOLoadP2='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else
+						 regDisplay2 when (GPIOLoadP2='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else
+						 regLed when (GPIOLoadP2='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else
+						 (others => '0');
 	-- END
 end archi;
 -- END FILE
