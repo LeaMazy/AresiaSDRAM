@@ -15,7 +15,7 @@ ENTITY uartComm IS
 		uartstore:	IN STD_LOGIC;		
 
 		data_out :  OUT 	STD_LOGIC_VECTOR(31 DOWNTO 0);
-		debug		:  OUT	STD_LOGIC_VECTOR(31 DOWNTO 0);
+--		debug		:  OUT	STD_LOGIC_VECTOR(31 DOWNTO 0);
 		tx			:	OUT	STD_LOGIC
 	);
 END uartComm;
@@ -48,9 +48,9 @@ ARCHITECTURE vhdl OF uartComm IS
 	SIGNAL SIGUART_STATUS : std_logic_vector(7 downto 0);
 	SIGNAL SIGMUXOUT		 : std_logic_vector(7 downto 0);
 	SIGNAL SIGREG_OUT	 	 : std_logic_vector(7 downto 0);
-	SIGNAL SIGdebug	 	 : std_logic_vector(7 downto 0);
-	SIGNAL SIGtestdebug   : std_logic;
-	SIGNAL SIGtestdeb     : std_logic :='0';
+--	SIGNAL SIGdebug	 	 : std_logic_vector(7 downto 0);
+--	SIGNAL SIGtestdebug   : std_logic;
+--	SIGNAL SIGtestdeb     : std_logic :='0';
 	
 BEGIN
 	SIGRESET_N <= not reset;
@@ -64,21 +64,21 @@ BEGIN
 	
 	SIGREG_OUT <= SIGMUXOUT when rising_edge(clk);
 	data_out <= "000000000000000000000000" & SIGREG_OUT;
-	-- debug <= "000000000000000000000000" & SIGRX_DATA;
-	-- debug <= "000000000000000000000000" & SIGdebug;
 	
+	-------------------debug------------------------
+--	debug <= "000000000000000000000000" & SIGRX_DATA;
+--	debug <= "000000000000000000000000" & SIGdebug;
 	
-	SIGtestdebug <= '1' WHEN ((SIGSEL_TX and SIGTX_BUSY) = '1') else
-					    SIGtestdeb;
-	SIGtestdeb <= SIGtestdebug WHEN rising_edge(clk);
+--	SIGtestdebug <= '1' WHEN ((SIGSEL_TX and SIGTX_BUSY) = '1') else
+--					    SIGtestdeb;
+--	SIGtestdeb <= SIGtestdebug WHEN rising_edge(clk);
 	
-	
-	debug <= "0000000000000000000000000000000" & SIGtestdeb;
+--	debug <= "0000000000000000000000000000000" & SIGtestdeb;
 	
 	
 	instUART : uart
 	PORT MAP(
-		debug 	=> SIGdebug,
+--		debug 	=> SIGdebug,
 		clk	   => clk,
 		reset_n	=> SIGRESET_N,
 		tx_ena	=> SIGSEL_TX,

@@ -1,6 +1,6 @@
 --
 -- Projet de fin d'études : RISC-V
--- ECE Paris / SECAPEM
+-- ECE Paris / ARESIA
 -- Displays VHDL
 
 -- LIBRARIES
@@ -35,8 +35,8 @@ entity GPIO is
 		DISPleds 	 : out std_logic_vector(31 downto 0);
 		DISPdisplay1 : out std_logic_vector(31 downto 0);
 		DISPdisplay2 : out std_logic_vector(31 downto 0);
-		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0);
-		debug			 : out std_logic_vector(31 DOWNTO 0)
+		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0)
+--		debug			 : out std_logic_vector(31 DOWNTO 0)
 	);
 end entity;
 
@@ -46,9 +46,9 @@ architecture archi of GPIO is
 		signal combDisplay1, regDisplay1 : std_logic_vector(31 downto 0);
 		signal combDisplay2, regDisplay2 : std_logic_vector(31 downto 0);
 		signal combLed, regLed : std_logic_vector(31 downto 0);
-		signal SIGgpio, TOPGPIO : std_logic_vector(31 downto 0);
-		signal GPIOLoadP2 : std_logic;
-		signal SIGtestdebug, SIGtestdeb : std_logic :='0';
+		signal SIGgpio, TOPGPIO, GPIOoutMux, GPIOoutReg : std_logic_vector(31 downto 0) := (others=> '0');
+--		signal SIGtestdebug, SIGtestdeb, SIGtestdebug2, SIGtestdeb2 : std_logic :='0';
+		
 begin
 	-- BEGIN
 	
@@ -70,21 +70,26 @@ begin
 	DISPdisplay1 <= regDisplay1;
 	DISPdisplay2 <= regDisplay2;
 	DISPleds 	 <= regLed;
-	
-	GPIOLoadP2	<= GPIOLoad when rising_edge(GPIOclock);
-	
-	GPIOoutput	 <= TOPGPIO when (GPIOLoadP2='1' and GPIOaddr(4)='1') else
-						 regDisplay1 when (GPIOLoadP2='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else
-						 regDisplay2 when (GPIOLoadP2='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else
-						 regLed when (GPIOLoadP2='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else
-						 (others => '0');
-						 
-	SIGtestdebug <= '1' WHEN (GPIOinput=x"0000000D") else
-					    SIGtestdeb;
-	SIGtestdeb <= SIGtestdebug WHEN rising_edge(GPIOclock);
+		
+	GPIOoutMux	 <= TOPGPIO when (GPIOcs='1' and GPIOLoad='1' and GPIOaddr(4)='1') else
+						 regDisplay1 when (GPIOcs='1' and GPIOLoad='1' and GPIOaddr(3)='0' and GPIOaddr(2)='1') else
+						 regDisplay2 when (GPIOcs='1' and GPIOLoad='1' and GPIOaddr(3)='1' and GPIOaddr(2)='0') else
+						 regLed when (GPIOcs='1' and GPIOLoad='1' and GPIOaddr(3)='1' and GPIOaddr(2)='1') else
+						 GPIOoutReg;
+	GPIOoutReg 	 <= GPIOoutMux when rising_edge(GPIOclock);
+	GPIOoutput 	 <= GPIOoutReg;
 	
 	
-	debug <= "0000000000000000000000000000000" & SIGtestdeb;
+	-------------------debug------------------------					 
+--	SIGtestdebug <= '1' WHEN (GPIOinput=x"0000000D") else
+--					    SIGtestdeb;
+--	SIGtestdeb <= SIGtestdebug WHEN rising_edge(GPIOclock);
+--	
+--	SIGtestdebug2 <= '1' WHEN (GPIOinput=x"00000012") else
+--						 SIGtestdeb2;
+--	SIGtestdeb2 <= SIGtestdebug2 WHEN rising_edge(GPIOclock);
+--	
+--	debug <= "00000000000000000000000" & SIGtestdeb2 & "0000000" & SIGtestdeb;
 	-- END
 end archi;
 -- END FILE

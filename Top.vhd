@@ -1,5 +1,5 @@
 -- Projet de fin d'études : RISC-V
--- ECE Paris / SECAPEM
+-- ECE Paris / ARESIA
 -- Top entity VHDL = Processor + DataMemory + InstructionMemory
 
 -- LIBRARIES
@@ -131,32 +131,33 @@ ARCHITECTURE archi OF Top IS
 	END COMPONENT;
 	
 	component Bootloader is
-	port (
-		--INPUTS
-		--INPUTS
-		clk 					: in std_logic;
-		CS 					: in std_logic; 							--chip select
-		addrInstBoot		: in std_logic_vector(11 downto 0); --addr of boot instruction
-		--OUTPUT
-		instBoot				: out std_logic_vector(31 downto 0)    --output boot instruction
-	);
+		port (
+			--INPUTS
+			--INPUTS
+			clk 					: in std_logic;
+			CS 					: in std_logic; 							--chip select
+			addrInstBoot		: in std_logic_vector(11 downto 0); --addr of boot instruction
+			--OUTPUT
+			instBoot				: out std_logic_vector(31 downto 0)    --output boot instruction
+		);
 	end component;
 	
    component uartComm IS
-	PORT(
-		clk		:	IN	STD_LOGIC;
-		reset	:	IN	STD_LOGIC;				--ascynchronous reset
-		data_in  :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-		-- reading  :  IN STD_LOGIC;
-		addOutMP	:	IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-		cs 		:	IN STD_LOGIC;
-	   rx			:	IN STD_LOGIC;	
-		uartload	:	IN STD_LOGIC;	
-		uartstore:	IN STD_LOGIC;	
-		data_out :  OUT 	STD_LOGIC_VECTOR(31 DOWNTO 0);
-		tx			:	OUT	STD_LOGIC;
-		debug		:  OUT	STD_LOGIC_VECTOR(31 DOWNTO 0)
-	);
+		PORT(
+			clk		:	IN	STD_LOGIC;
+			reset	:	IN	STD_LOGIC;				--ascynchronous reset
+	--		debug		:  OUT	STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+			data_in  :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+			-- reading  :  IN STD_LOGIC;
+			addOutMP	:	IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+			cs 		:	IN STD_LOGIC;
+			rx			:	IN STD_LOGIC;	
+			uartload	:	IN STD_LOGIC;	
+			uartstore:	IN STD_LOGIC;	
+			data_out :  OUT 	STD_LOGIC_VECTOR(31 DOWNTO 0);
+			tx			:	OUT	STD_LOGIC
+		);
 	END component;
 	
 	
@@ -175,7 +176,8 @@ ARCHITECTURE archi OF Top IS
 			OUT_Write_Select : OUT STD_LOGIC;
 			OUT_Data_16      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			OUT_Select       : OUT STD_LOGIC;
-			OUT_DQM          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+		   OUT_DQMH			  : OUT STD_LOGIC;
+		   OUT_DQML			  : OUT STD_LOGIC;
 			-- Test Outputs (32bits)
 			Ready_32b        : OUT STD_LOGIC;
 			Data_Ready_32b   : OUT STD_LOGIC;
@@ -183,8 +185,8 @@ ARCHITECTURE archi OF Top IS
 			-- Test Outputs (16bits)
 			Ready_16b        : IN  STD_LOGIC;
 			Data_Ready_16b   : IN  STD_LOGIC;
-			DataOut_16b      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			debug				  : OUT STD_LOGIC_VECTOR
+			DataOut_16b      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0)
+--			debug				  : OUT STD_LOGIC_VECTOR
 		);
 	END COMPONENT;
 
@@ -213,9 +215,8 @@ ARCHITECTURE archi OF Top IS
 			-- INPUTS
 			clock             : IN  STD_LOGIC;
 			reset             : IN  STD_LOGIC;
-			debug 			: out STD_LOGIC_VECTOR(31 downto 0);
-			bootfinish			: out std_logic;
-			loadinst				: IN	STD_LOGIC;
+			loadBootInst		: IN	STD_LOGIC;
+--	   	debug 				: out STD_LOGIC_VECTOR(31 downto 0);
 
 			------------------------ TO PROC -----------------------
 			PROCinstruction   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -268,8 +269,8 @@ ARCHITECTURE archi OF Top IS
 		DISPleds 	 : out std_logic_vector(31 downto 0);
 		DISPdisplay1 : out std_logic_vector(31 downto 0);
 		DISPdisplay2 : out std_logic_vector(31 downto 0);
-		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0);
-		debug			 : out std_logic_vector(31 DOWNTO 0)
+		GPIOoutput	 : out std_logic_vector(31 DOWNTO 0)
+--		debug			 : out std_logic_vector(31 DOWNTO 0)
 
 	);	
 	END COMPONENT;
@@ -294,8 +295,8 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL debugLeds												  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL procDisplay1, procDisplay2, procLed           : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL RegcsDMProc, MuxcsDMProc                      : STD_LOGIC;
-	signal SIGtestdebug, SIGtestdeb : std_logic :='0';
-	SIGNAL debugS           										  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--	signal SIGtestdebug, SIGtestdeb, SIGtestdebug2, SIGtestdeb2 : std_logic :='0';
+--	SIGNAL debugS           										  		: STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 
 	SIGNAL SIGPROCinstruction 			: STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -320,9 +321,8 @@ ARCHITECTURE archi OF Top IS
 	
 	--Store/Load SRAM
 	SIGNAL SIGMEMcs	 	 	 : std_logic;
-	SIGNAL MuxPROCstore_b  : STD_LOGIC;
+	SIGNAL MuxPROCstore  : STD_LOGIC;
 	SIGNAL SIGPROCdq		: STD_LOGIC_VECTOR(3 DOWNTO 0);
-	SIGNAL SIGMEMdq		: STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL SIGMEMload		: std_logic;
 	--BootLoader
 	SIGNAL SIGbootReg1, SIGbootReg2 : std_logic;
@@ -334,8 +334,8 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGinstMux 	 	 : std_logic_vector(31 downto 0);
 	--UART
 	SIGNAL SIGuartCS	 	 	 	: std_logic;
-	SIGNAL SIGSelectDataOut  	: std_logic_vector(4 downto 0);
-	SIGNAL SIGSelectDataOutReg :std_logic_vector(4 downto 0); 
+	SIGNAL SIGSelectDataOut  	: std_logic_vector(2 downto 0);
+	SIGNAL SIGSelectDataOutReg : std_logic_vector(2 downto 0); 
 	SIGNAL SIGUARTOut			 	: std_logic_vector(31 downto 0);
 	SIGNAL SIGMuxDataOut		 	: std_logic_vector(31 downto 0);
 	SIGNAL SIGdebugUART,SIGdebugConv, SIGdebugMinicache, SIGdebugGPIO		 	: std_logic_vector(31 downto 0);
@@ -347,7 +347,8 @@ ARCHITECTURE archi OF Top IS
 	SIGNAL SIGOUT_Write_Select                           : STD_LOGIC;
 	SIGNAL SIGOUT_Data_16                                : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL SIGOUT_Select                                 : STD_LOGIC;
-	SIGNAL SIGOUT_DQM                                    : STD_LOGIC_VECTOR(1 DOWNTO 0);
+	SIGNAL SIGOUT_DQMH, SIGOUT_DQML                       : STD_LOGIC;
+	SIGNAL SIGOUT_DQM 											  : STD_LOGIC_VECTOR(1 DOWNTO 0);
 	-- Outputs of SDRAM controller (16bits)
 	SIGNAL SIGReady_16b                                  : STD_LOGIC;
 	SIGNAL SIGData_Ready_16b                             : STD_LOGIC;
@@ -380,10 +381,10 @@ BEGIN
 	-----------------------
 	
 	-- Chip Select for sram, displayer and uart
-	SIGmemCS <= '0' when (SIGPROCaddrDM(31)='1' and (SIGPROCload='1' or SIGPROCstore='1')) else
-					 '1'; --when (SIGPROCload='0') or (SIGPROCstore='0');
-	SIGdispCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0') else '0';
-	SIGuartCS <= '1' when (SIGPROCload='1' or SIGPROCstore='1') and (SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1') else '0';
+	SIGmemCS  <= '0' when SIGPROCaddrDM(31)='1' else '1';
+	SIGdispCS <= '1' when SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='0' else '0';
+
+	SIGuartCS <= '1' when SIGPROCaddrDM(31)='1' and SIGPROCaddrDM(30)='1' else '0';
 
 	SIGMEMload <= SIGPROCload and SIGmemCS;
 	
@@ -393,51 +394,56 @@ BEGIN
 	
 	-- Sram specific signal
 	-- avoid writing in memory when the proc wants to write on its outputs
-	MuxPROCstore_b <= '0' WHEN SIGPROCaddrDM(31)='1' ELSE
-							SIGPROCstore;
-	SIGMEMdq <= (others => '0') WHEN SIGMEMcs='0' else SIGPROCdq;
-	--
-
+	MuxPROCstore <= '0' WHEN SIGPROCaddrDM(31)='1' ELSE
+							SIGPROCstore;	--
+	
 	SIGenabledebugsync <= enableDebug WHEN rising_edge(SIGPLLclock);
 	
 	SIGclock    <= TOPclock WHEN SIGsimulOn = '1' ELSE
-								buttonClock WHEN SIGenabledebugsync = '1' ELSE -- AND SIGbootfinish='1' ELSE
-								SIGPLLclock;
+						buttonClock WHEN SIGenabledebugsync = '1' ELSE
+						SIGPLLclock;
 
 	TOPdisplay1 <= procDisplay1 WHEN SIGenabledebugsync = '0' ELSE
 		            debugDisplay1;
 
-	TOPdisplay2 <= --SIGPROCoutputDM;
---						procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
---		            debugDisplay2;
---						-- SIGdebugUART;
+	TOPdisplay2 <= procDisplay2 WHEN SIGenabledebugsync = '0' ELSE
+		            debugDisplay2;
+--						SIGPROCoutputDM;
+--						SIGdebugUART;
 --						SIGdebugConv;
 --						SIGdebugMinicache;
 --						debugS;
-						SIGdebugGPIO;
+--						SIGdebugGPIO;
 
 	TOPLeds <= procLed WHEN SIGenabledebugsync = '0' ELSE debugLeds;
 
 	
-	SIGSelectDataOut <= SIGSelectDataOutReg when SIGPROChold='1' else
-							  SIGmemCS & SIGdispCS & SIGuartCS & SIGPROCaddrDM(3) & SIGPROCaddrDM(2);
-							  
+	SIGSelectDataOut <= SIGmemCS & SIGdispCS & SIGuartCS when SIGPROChold='0' else
+							  SIGSelectDataOutReg;			  
 	SIGSelectDataOutReg <= SIGSelectDataOut when rising_edge(SIGclock);
-	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOutReg(4 downto 2)="100") else
-							--procDisplay1    when (SIGSelectDataOut="01001") else --0x80000004
-							--procDisplay2    when (SIGSelectDataOut="01010") else --0x80000008
-							SIGgpio    when (SIGSelectDataOutReg(4 downto 2)="010") else 
-							SIGUARTOut 		 when (SIGSelectDataOutReg(4 downto 2)="001") else 
-							(x"00000002");		-- (others => '0')
+	
+	SIGMuxDataOut <=  SIGPROCoutputDM when (SIGSelectDataOutReg="100") else
+							SIGgpio    		 when (SIGSelectDataOutReg="010") else 
+							SIGUARTOut 		 when (SIGSelectDataOutReg="001") else 
+							(others => '0');
 					
 	SIGbootReg1 <= switchBoot when rising_edge(SIGclock);
 	SIGbootReg2 <= SIGbootReg1 when rising_edge(SIGclock);
 	SIGbootChg 	<= SIGbootReg1 xor SIGbootReg2;
-								  
-	SIGtestdebug <= '1' WHEN (SIGPROCinputDM=x"00000012") else
-						 SIGtestdeb;
-	SIGtestdeb <= SIGtestdebug WHEN rising_edge(SIGclock);
-	debugS <= "0000000000000000000000000000000" & SIGtestdeb;
+
+	
+	SIGOUT_DQM	<= SIGOUT_DQMH & SIGOUT_DQML;
+
+		
+	-------------------debug (display directly on disp2)------------------------
+--	SIGtestdebug <= '1' WHEN (SIGPROCinputDM=x"000000F0") else
+--						 SIGtestdeb;
+--	SIGtestdeb <= SIGtestdebug WHEN rising_edge(SIGclock);
+--	SIGtestdebug2 <= '1' WHEN (SIGPROCinputDM=x"00000012") else
+--						 SIGtestdeb2;
+--	SIGtestdeb2 <= SIGtestdebug2 WHEN rising_edge(SIGclock);
+--	debugS <= "00000000000000000000000" & SIGtestdeb2 & "0000000" & SIGtestdeb;
+	
 	-- INSTANCES
 
 	debug : debUGER
@@ -472,7 +478,6 @@ BEGIN
 		PROCreset       => TOPreset,
 		PROCinstruction => SIGinstMux,
 		PROCoutputDM    => SIGMuxDataOut,
---		PROCoutputDM    => SIGPROCoutputDM,
 		-- OUTPUTS
 		PROCprogcounter => SIGPROCprogcounter,
 		PROCPC 			 => SIGPROCPC,
@@ -497,20 +502,6 @@ BEGIN
 		CPTcounter => SIGcounter
 	);
 
---	instDISP : Displays
---	PORT MAP(
---		--INPUTS
---		DISPcs 		 => SIGdispCS,
---		DISPclock    => SIGclock,
---		DISPreset    => TOPreset,
---		DISPaddr     => SIGPROCaddrDM,
---		DISPinput    => SIGPROCinputDM,
---		DISPWrite    => SIGPROCstore,
---		--OUTPUTS
---		DISPleds     => procLed, --procLed,
---		DISPdisplay1 => procDisplay1,	--procDisplay1,
---		DISPdisplay2 => procDisplay2 --procDisplay1,
---	);
 
 	instPLL : clock1M
 	PORT MAP(
@@ -520,21 +511,6 @@ BEGIN
 		locked => PLLlock
 	);
 	
-	
---	Memory : RAM8x4
---	PORT MAP(
---		address_a => SIGPROCprogcounter(13 downto 2),  --  Addr instruction (divided by 4 because we use 32 bits memory)
---		address_b => SIGPROCaddrDM(13 downto 2),       --  Addr memory (divided by 4 because we use 32 bits memory)
---		clock     => SIGclock,
---		data_a    => (OTHERS => '0'), 		-- Instruction in
---		data_b    => SIGPROCinputDM,  	-- Data in
---		enable    => '1',						-- ChipSelect for SRAM
---		wren_a    => '0',       -- Write Instruction Select
---		wren_b    => MuxPROCstore_b,       -- Write Data Select
---		dq			 => SIGMEMdq,
---		q_a       => SIGPROCinstruction, -- DataOut Instruction
---		q_b       => SIGPROCoutputDM		-- DataOut Data
---	);
 	
 	instBoot : Bootloader
 	port map(
@@ -557,8 +533,8 @@ BEGIN
 		cs 		=> SIGuartCS,
 	   rx			=>	rx,
 		data_out => SIGUARTOut,
-		tx			=> tx,
-		debug		=> SIGdebugUART
+		tx			=> tx
+--		debug		=> SIGdebugUART
 	);
 	
 	SDRAMconverter : SDRAM_32b
@@ -566,7 +542,7 @@ BEGIN
 		-- SDRAM Inputs
 		Clock            => SIGclock,
 		Reset            => TOPreset,
-		debug				  => SIGdebugConv,
+--		debug				  => SIGdebugConv,
 		-- Inputs (32bits)
 		IN_Address       => SIGAddressDM(25 DOWNTO 0),
 		IN_Write_Select  => SIGwriteSelect,
@@ -578,7 +554,8 @@ BEGIN
 		OUT_Write_Select => SIGOUT_Write_Select,
 		OUT_Data_16      => SIGOUT_Data_16,
 		OUT_Select       => SIGOUT_Select,
-		OUT_DQM          => SIGOUT_DQM,
+		OUT_DQMH         => SIGOUT_DQMH,
+		OUT_DQML         => SIGOUT_DQML,
 		-- Outputs (32bits)
 		Ready_32b        => SIGReady_32b,
 		Data_Ready_32b   => SIGData_Ready_32b,
@@ -619,16 +596,15 @@ BEGIN
 		-- SDRAM Inputs
 		clock            => SIGclock,
 		reset            => TOPreset,
-		debug				  => SIGdebugMinicache,
-		bootfinish		  => SIGbootfinish,
-		loadinst			  => SIGboot,
+--		debug				  => SIGdebugMinicache,
+		loadBootInst			  => SIGboot,
 		------------------------ TO PROC -----------------------
 		PROCinstruction  => SIGPROCinstruction,
 		PROCoutputDM     => SIGPROCoutputDM,
 		PROChold         => SIGPROChold,
 		----------------------- FROM PROC ----------------------
 		PROCprogcounter  => SIGPROCprogcounter,
-		PROCstore        => MuxPROCstore_b,
+		PROCstore        => MuxPROCstore,
 		PROCload         => SIGMEMload,
 		PROCfunct3       => SIGPROCfunct3,
 		PROCaddrDM       => SIGPROCaddrDM,
@@ -674,8 +650,8 @@ BEGIN
 		DISPleds 	 => procLed,
 		DISPdisplay1 => procdisplay1,
 		DISPdisplay2 => procdisplay2,
-		GPIOoutput	 => SIGgpio,
-		debug 		 => SIGdebugGPIO
+		GPIOoutput	 => SIGgpio
+--		debug 		 => SIGdebugGPIO
 	);
 	
 	

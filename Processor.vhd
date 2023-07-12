@@ -201,7 +201,6 @@ ARCHITECTURE archi OF Processor IS
 	SIGNAL MuxNOPtest, RegNOPtest : STD_LOGIC;
 	SIGNAL RegaddrLoad            : STD_LOGIC_VECTOR(4 DOWNTO 0);
 	SIGNAL funct3Load, function3  : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL DMout                  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL Regreset               : STD_LOGIC;
 	SIGNAL SigLock                : STD_LOGIC;
 
@@ -252,7 +251,7 @@ BEGIN
 				  SIGrdID WHEN (SIGbranch = '0' AND SIGstore = '0') ELSE
 				  (OTHERS => '0');
 
-	SIGinputRF <= SIG_RF_Align_in WHEN SIGloadP2 = '1' ELSE --- (DMOUT à l'origine) avant il y a avait sigload (au cas ou ca pmarche plus)
+	SIGinputRF <= SIG_RF_Align_in WHEN SIGloadP2 = '1' ELSE
 					  STD_LOGIC_VECTOR(unsigned(SIGprogcounter) + 4) WHEN (SIGjal = '1' OR SIGjalr = '1') ELSE
 					  SIGimm32U WHEN SIGlui = '1' ELSE
 					  STD_LOGIC_VECTOR(unsigned(SIGimm32U) + unsigned(SIGprogcounter)) WHEN SIGauipc = '1' ELSE
@@ -310,15 +309,6 @@ BEGIN
 				  '0';
 	------------------------------------
 
---	DMout <= PROCoutputDM;
-
-	DMout <= (31 downto 8 => PROCoutputDM(7)) & PROCoutputDM(7 downto 0) when SIGloadP2='1' and function3 = "000" else
-				(31 downto 16 => PROCoutputDM(15)) & PROCoutputDM(15 downto 0) when SIGloadP2='1' and function3 = "001" else
-				PROCoutputDM(31 downto 0) when SIGloadP2='1' and function3 = "010" else
-				(31 downto 8 => '0') & PROCoutputDM(7 downto 0) when  SIGloadP2='1' and function3 = "100" else
-				(31 downto 16 => '0') &  PROCoutputDM(15 downto 0) when  SIGloadP2='1' and function3 = "101" else
-	    		(others=>'0');
-				
 	PROCdq <= SIGPROCdq when (SIGstore='1') else "0000";
 	PROCRFin 		<= SIGinputRF;
 	PROCRFout1		<= SIGoutput1RF;
