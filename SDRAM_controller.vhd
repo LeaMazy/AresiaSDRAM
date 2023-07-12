@@ -19,7 +19,7 @@ entity SDRAM_controller is
         SDRAM_ADDR   	                     : out STD_LOGIC_VECTOR (12 downto 0);  			    -- SDRAM : Address
 		  SDRAM_DQ   	                        : inout STD_LOGIC_VECTOR ((DATA_WIDTH-1) downto 0); -- SDRAM : data input / output
 		  SDRAM_BA   	                        : out STD_LOGIC_VECTOR (1 downto 0);  				    -- SDRAM : Bank Select
-		  SDRAM_DQM		                        : out STD_LOGIC_VECTOR ((DQM_WIDTH-1) downto 0);    -- SDRAM : DQM Mask
+		  SDRAM_DQM		                        : out STD_LOGIC_VECTOR ((DQM_WIDTH-1) downto 0);    -- SDRAM : DQM Mask (High and Low)
 		  SDRAM_RAS_N, SDRAM_CAS_N, SDRAM_WE_N : out STD_LOGIC;  			                         -- SDRAM : RAS + CAS + WE = CMD
 		  SDRAM_CKE, SDRAM_CS_N                : out STD_LOGIC ;           					          -- SDRAM : CKE (clock rising edge) | CS (chip select)
 		  SDRAM_CLK                            : out STD_LOGIC ;												 -- SDRAM : Clock
