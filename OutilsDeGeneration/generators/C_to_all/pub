@@ -1,0 +1,145 @@
+.asm file generated
+.bin file generated
+.hex memory files generated
+.vhd memory files generated
+.vhd testbench file generated
+**** SIMULATION ****
+Simulation: 
+
+  0 : 0x00000000 : 0x00001137 : LUI	: reg[02] = 0x1 << 12
+                                          reg[02] = 0x1000
+  1 : 0x00000004 : 0x054000ef : JAL	: reg[01] = PC+4 and PC = 0x4 + 84
+                                          reg[01] = 0x8 and PC = 0x58
+  2 : 0x00000058 : 0x08c00793 : ADDI	: reg[15] = reg[00] + 140
+                                          reg[15] = 0x0 + 140 = 0x8c
+  3 : 0x0000005c : 0x03c78713 : ADDI	: reg[14] = reg[15] + 60
+                                          reg[14] = 0x8c + 60 = 0xc8
+  4 : 0x00000060 : 0x800006b7 : LUI	: reg[13] = 0x80000 << 12
+                                          reg[13] = 0x80000000
+  5 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0x8c] = 0xc0
+  6 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0x8c + 4 = 0x90
+  7 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xc0
+  8 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0x90 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+  9 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0x90] = 0xf9
+ 10 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0x90 + 4 = 0x94
+ 11 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xf9
+ 12 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0x94 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 13 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0x94] = 0xa4
+ 14 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0x94 + 4 = 0x98
+ 15 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xa4
+ 16 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0x98 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 17 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0x98] = 0xb0
+ 18 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0x98 + 4 = 0x9c
+ 19 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xb0
+ 20 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0x9c != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 21 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0x9c] = 0x99
+ 22 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0x9c + 4 = 0xa0
+ 23 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x99
+ 24 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xa0 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 25 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xa0] = 0x92
+ 26 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xa0 + 4 = 0xa4
+ 27 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x92
+ 28 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xa4 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 29 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xa4] = 0x82
+ 30 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xa4 + 4 = 0xa8
+ 31 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x82
+ 32 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xa8 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 33 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xa8] = 0xf8
+ 34 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xa8 + 4 = 0xac
+ 35 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xf8
+ 36 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xac != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 37 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xac] = 0x80
+ 38 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xac + 4 = 0xb0
+ 39 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x80
+ 40 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xb0 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 41 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xb0] = 0x90
+ 42 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xb0 + 4 = 0xb4
+ 43 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x90
+ 44 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xb4 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 45 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xb4] = 0x88
+ 46 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xb4 + 4 = 0xb8
+ 47 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x88
+ 48 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xb8 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 49 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xb8] = 0x83
+ 50 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xb8 + 4 = 0xbc
+ 51 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x83
+ 52 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xbc != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 53 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xbc] = 0xc6
+ 54 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xbc + 4 = 0xc0
+ 55 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xc6
+ 56 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xc0 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 57 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xc0] = 0xa1
+ 58 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xc0 + 4 = 0xc4
+ 59 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0xa1
+ 60 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xc4 != 0xc8 ) PC = 0x70 + -12 => PC = 0x64
+ 61 : 0x00000064 : 0x0007a603 : LDW	: reg[12] = dataMem[reg[15] + 0]
+                                          reg[12] = dataMem[0xc4] = 0x86
+ 62 : 0x00000068 : 0x00478793 : ADDI	: reg[15] = reg[15] + 4
+                                          reg[15] = 0xc4 + 4 = 0xc8
+ 63 : 0x0000006c : 0x00c6a423 : STRW	: dataMem[reg[13] + 8] = reg[12]
+***OOM***                                          dataMem[0x80000008] = 0x86
+ 64 : 0x00000070 : 0xfee79ae3 : BNE	: if ( reg[15] != reg[14] ) PC = PC + -12 
+                                          if ( 0xc8 != 0xc8 ) PC = 0x70 + -12 => PC = 0x74
+ 65 : 0x00000074 : 0x00000513 : ADDI	: reg[10] = reg[00] + 0
+                                          reg[10] = 0x0 + 0 = 0x0
+ 66 : 0x00000078 : 0x00008067 : JALR	: reg[00] = PC+4 and PC = (reg[01] + 0) & ~1 
+                                          reg[00] = 0x7c and PC = 0x8
+
+'output/hex/IMhex.hex' -> '../../VHDL/PROC-ECE_SYNC-GALOPE-V3/IMhex.hex'
+'output/hex/IMhex.hex' -> '../../VHDL/PROC-ECE_SYNC-GALOPE-V3/RAMhex32.hex'
