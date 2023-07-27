@@ -114,35 +114,35 @@ display6 <= x"f" when enable='1' AND SW="100000" else
 				x"f";		
 				
 decoder1 : SegmentDecoder
-PORT MAP(
-	Sin7seg		=>	display1,
-	decodeOut	=> TOPdisplay2(15 downto 8)
-);
+	PORT MAP(
+		Sin7seg		=>	display1,
+		decodeOut	=> TOPdisplay2(15 downto 8)
+	);
 decoder2 : SegmentDecoder
-PORT MAP(
-	Sin7seg		=> display2,
-	decodeOut	=> TOPdisplay2(7 downto 0)
-);
+	PORT MAP(
+		Sin7seg		=> display2,
+		decodeOut	=> TOPdisplay2(7 downto 0)
+	);
 decoder3 : SegmentDecoder
-PORT MAP(
-	Sin7seg		=> display3,
-	decodeOut	=> TOPdisplay1(31 downto 24)
-);
+	PORT MAP(
+		Sin7seg		=> display3,
+		decodeOut	=> TOPdisplay1(31 downto 24)
+	);
 decoder4 : SegmentDecoder
-PORT MAP(
-	Sin7seg		=> display4,
-	decodeOut	=> TOPdisplay1(23 downto 16)
-);
+	PORT MAP(
+		Sin7seg		=> display4,
+		decodeOut	=> TOPdisplay1(23 downto 16)
+	);
 decoder5 : SegmentDecoder
-PORT MAP(
-	Sin7seg		=> display5,
-	decodeOut	=> TOPdisplay1(15 downto 8)
-);
+	PORT MAP(
+		Sin7seg		=> display5,
+		decodeOut	=> TOPdisplay1(15 downto 8)
+	);
 decoder6 : SegmentDecoder
-PORT MAP(
-	Sin7seg		=> display6,
-	decodeOut	=> TOPdisplay1(7 downto 0)
-);
+	PORT MAP(
+		Sin7seg		=> display6,
+		decodeOut	=> TOPdisplay1(7 downto 0)
+	);
 	
 END archi;
 -- END FILE
